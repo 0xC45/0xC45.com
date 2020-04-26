@@ -1,0 +1,393 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
+    <channel>
+        <title>0xC45</title>
+        <link>https://0xC45.com</link>
+        <description>0xC45 blog</description>
+        <generator>Zola</generator>
+        <language>en</language>
+        <atom:link href="https://0xC45.com/rss.xml" rel="self" type="application/rss+xml"/>
+        <lastBuildDate>Sat, 25 Apr 2020 00:00:00 +0000</lastBuildDate>
+        
+            <item>
+                <title>OpenBSD Home Router</title>
+                <pubDate>Sat, 25 Apr 2020 00:00:00 +0000</pubDate>
+                <link>https://0xC45.com/blog/openbsd-home-router/</link>
+                <guid>https://0xC45.com/blog/openbsd-home-router/</guid>
+                <description>&lt;h2 id=&quot;overview&quot;&gt;Overview&lt;&#x2F;h2&gt;
+&lt;p&gt;Recently, I made a home router from scratch using &lt;a href=&quot;https:&#x2F;&#x2F;www.openbsd.org&#x2F;66.html&quot;&gt;OpenBSD 6.6&lt;&#x2F;a&gt;, without installing any additional packages, using only what comes with the basic OS installation. Originally, before deciding to &amp;quot;do it from scratch&amp;quot;, I had a goal to make a router using open source software in order to improve my network security. After looking at some popular open source firewall and routing projects (mainly &lt;a href=&quot;https:&#x2F;&#x2F;www.pfsense.org&#x2F;&quot;&gt;pfSense&lt;&#x2F;a&gt; and &lt;a href=&quot;https:&#x2F;&#x2F;opnsense.org&#x2F;&quot;&gt;OPNSense&lt;&#x2F;a&gt;), I finally decided to build my own. pfSense and OPNSense both seem like decent software (and I have successfully used both in the past), but this time, I wanted to &amp;quot;do it the hard way&amp;quot; and learn about the services that make up a typical router. Here are some of the cool features that my custom device currently has:&lt;&#x2F;p&gt;
+&lt;ol&gt;
+&lt;li&gt;It&#x27;s almost fully open source, down to the BIOS and firmware. Unfortunately, the hardware isn&#x27;t open source.&lt;&#x2F;li&gt;
+&lt;li&gt;It ensures that every DNS request leaving my network is encrypted.&lt;&#x2F;li&gt;
+&lt;li&gt;It caches DNS lookups for every device on my network, improving request speeds.&lt;&#x2F;li&gt;
+&lt;li&gt;It supports custom local network DNS entries, allowing me to refer to the various services on my network using memorable names, rather than IP addresses.&lt;&#x2F;li&gt;
+&lt;&#x2F;ol&gt;
+&lt;p&gt;Of course, because this device is configured and built from scratch, the sky is the limit in terms of potential features and improvements. In the future, I may add improvements such as a VPN server or metrics reporting &#x2F; analytics.&lt;&#x2F;p&gt;
+&lt;p&gt;Before we begin, because I can&#x27;t really claim to know what I&#x27;m doing (I&#x27;m not a networking &#x2F; firewall expert), I must make a disclaimer. This is a toy project. You probably shouldn&#x27;t use this in production. However, having said that, I have been using this setup (in &amp;quot;production&amp;quot;) for several months now and it has been stable. I haven&#x27;t noticed any internet issues caused by this appliance. In addition, it seems quite secure. OpenBSD has a reputation for being a secure OS and I made every effort to configure the various services correctly. If you notice any mistakes with this configuration (or potential improvements to make), please let me know! Anyway, let&#x27;s dive into the details.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;hardware-apu2&quot;&gt;Hardware (apu2)&lt;&#x2F;h2&gt;
+&lt;p&gt;First, I needed an actual machine for my home network appliance. After considering the various options (purchase a device, build something myself, use a virtual machine, etc.) I decided to use an &lt;a href=&quot;https:&#x2F;&#x2F;pcengines.ch&#x2F;apu2.htm&quot;&gt;apu2&lt;&#x2F;a&gt;. It is a low-power, relatively inexpensive yet performant solution, which makes it ideal for this kind of application. In addition, it uses an open source BIOS (&lt;a href=&quot;https:&#x2F;&#x2F;github.com&#x2F;pcengines&#x2F;seabios&quot;&gt;SeaBIOS&lt;&#x2F;a&gt;) and firmware (&lt;a href=&quot;https:&#x2F;&#x2F;github.com&#x2F;pcengines&#x2F;coreboot&quot;&gt;coreboot&lt;&#x2F;a&gt;). I went with a model that has a quad-core processor, 4GB memory, and 3 separate gigabit NICs. In addition, I purchased a 16GB M-SATA SSD (for the main OS installation), a 4GB SD (for a utility OS installation), a case, and a serial cable (the apu2 does not have a port for graphics output). The total cost was roughly $160.&lt;&#x2F;p&gt;
+&lt;p&gt;After the device arrived, the first challenge was connecting to it. Ok, it wasn&#x27;t actually that challenging. I connected to the apu2 with my OpenBSD netbook and the serial cable:&lt;&#x2F;p&gt;
+&lt;pre style=&quot;background-color:#2b303b;&quot;&gt;
+&lt;span style=&quot;color:#c0c5ce;&quot;&gt;cu -l &#x2F;dev&#x2F;cuaU0 -s 115200
+&lt;&#x2F;span&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;No matter which software you use to connect to the apu2 over serial, the important setting is the default baud rate, 115200.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;firmware-coreboot&quot;&gt;Firmware (coreboot)&lt;&#x2F;h2&gt;
+&lt;p&gt;After booting up the apu2, I noticed that the BIOS was a bit out of date. It was probably flashed with the current BIOS version at the time of manufacturing, which was likely a while before it ended up in my hands. So, I needed to upgrade the BIOS. The &lt;a href=&quot;https:&#x2F;&#x2F;pcengines.ch&#x2F;howto.htm#bios&quot;&gt;official instructions&lt;&#x2F;a&gt; describe a method to update the BIOS using a PC Engines custom TinyCore Linux distribution. However, since I was already planning to make two different boot disks, one for the router OS and one for a &amp;quot;utility&amp;quot; OS, I decided to setup the utility OS and make it capable of flashing the BIOS.&lt;&#x2F;p&gt;
+&lt;h3 id=&quot;utility-os-debian&quot;&gt;Utility OS (Debian)&lt;&#x2F;h3&gt;
+&lt;p&gt;Given that my apu2 device has two disks, it made sense to create a separate OS installation on the second disk. In addition to being capable of flashing the BIOS, I envision the second &amp;quot;utility&amp;quot; OS as a backup plan, in case I ever misconfigure the main router OS and want to attempt to debug network issues in a fresh environment. I would only boot into the utility OS for special situations. Generally, the device will always be running the main router OS.&lt;&#x2F;p&gt;
+&lt;p&gt;For the &amp;quot;utility&amp;quot; OS, I decided to use Debian Linux, because I like Debian. So, I made a Debian USB installer and booted the apu2 from it. There are a few important steps to follow in order to boot the Debian installer into a serial tty (thanks to &lt;a href=&quot;https:&#x2F;&#x2F;teklager.se&#x2F;en&#x2F;knowledge-base&#x2F;installing-debian-over-serial-console-apu-board&#x2F;&quot;&gt;TekLager&lt;&#x2F;a&gt; for the post on how to boot Debian on an apu2).&lt;&#x2F;p&gt;
+&lt;ol&gt;
+&lt;li&gt;Highlight the &amp;quot;Install&amp;quot; boot option (not &amp;quot;Graphical Install&amp;quot;)&lt;&#x2F;li&gt;
+&lt;li&gt;Press &lt;code&gt;&amp;lt;tab&amp;gt;&lt;&#x2F;code&gt; to edit the boot entry&lt;&#x2F;li&gt;
+&lt;li&gt;Remove &lt;code&gt;vga=xxx&lt;&#x2F;code&gt; to disable graphical output&lt;&#x2F;li&gt;
+&lt;li&gt;Add &lt;code&gt;console=ttyS0,115200n8&lt;&#x2F;code&gt; to enable the serial tty&lt;&#x2F;li&gt;
+&lt;li&gt;Press &lt;code&gt;&amp;lt;enter&amp;gt;&lt;&#x2F;code&gt; to boot&lt;&#x2F;li&gt;
+&lt;&#x2F;ol&gt;
+&lt;p&gt;Then, I walked through the regular Debian installation. However, because the install target disk is pretty small (4GB), the installer couldn&#x27;t auto-partition the disk. So, it was necessary to manually setup disk partitions. Here are the settings that I used:&lt;&#x2F;p&gt;
+&lt;ul&gt;
+&lt;li&gt;200 MB primary ext4 partition (bootable, relatime flag set, mount point: &#x2F;boot)&lt;&#x2F;li&gt;
+&lt;li&gt;3.8 GB primary crypto partition&lt;&#x2F;li&gt;
+&lt;li&gt;Then, after setting up the crypto partition (erase disk, set password)
+&lt;ul&gt;
+&lt;li&gt;3.8 GB primary ext4 partition (mount point: &#x2F;)&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;p&gt;In order to boot the new Debian installation for the first time, I had to manually edit the boot entry. Like before, add &lt;code&gt;console=ttyS0,115200n8&lt;&#x2F;code&gt; to boot into a serial tty. Then, after booting and logging in as root, I configured grub so that it would no longer be necessary to manually edit the boot entry. To do that, edit &#x2F;etc&#x2F;default&#x2F;grub and change the following settings:&lt;&#x2F;p&gt;
+&lt;pre style=&quot;background-color:#2b303b;&quot;&gt;
+&lt;span style=&quot;color:#c0c5ce;&quot;&gt;GRUB_CMDLINE_LINUX=&amp;#39;console=ttyS0,19200n8&amp;#39;
+GRUB_TERMINAL=serial
+&lt;&#x2F;span&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;Finally, run &lt;code&gt;update-grub&lt;&#x2F;code&gt; to regenerate the grub boot menu. At this point, the Debian &amp;quot;utility&amp;quot; OS install is complete and it is time to update the BIOS.&lt;&#x2F;p&gt;
+&lt;h3 id=&quot;firmware-update&quot;&gt;Firmware Update&lt;&#x2F;h3&gt;
+&lt;p&gt;Updating the BIOS is fairly simple. First, install the flashrom utility. It&#x27;s available in the Debian package repositories.&lt;&#x2F;p&gt;
+&lt;pre style=&quot;background-color:#2b303b;&quot;&gt;
+&lt;span style=&quot;color:#c0c5ce;&quot;&gt;apt install flashrom
+&lt;&#x2F;span&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;Then, download the latest mainline version of the firmware from &lt;a href=&quot;https:&#x2F;&#x2F;pcengines.github.io&#x2F;&quot;&gt;https:&#x2F;&#x2F;pcengines.github.io&#x2F;&lt;&#x2F;a&gt;, write the file to a USB, and mount the USB on the apu2. To flash the firmware (assuming the file is named coreboot.rom), run:&lt;&#x2F;p&gt;
+&lt;pre style=&quot;background-color:#2b303b;&quot;&gt;
+&lt;span style=&quot;color:#c0c5ce;&quot;&gt;flashrom -w coreboot.rom -p internal
+&lt;&#x2F;span&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;Then, reboot. For more information on flashing the apu2 firmware, check out the &lt;a href=&quot;https:&#x2F;&#x2F;github.com&#x2F;pcengines&#x2F;apu2-documentation&#x2F;blob&#x2F;master&#x2F;docs&#x2F;firmware_flashing.md&quot;&gt;docs&lt;&#x2F;a&gt;.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;os-openbsd&quot;&gt;OS (OpenBSD)&lt;&#x2F;h2&gt;
+&lt;p&gt;Ok, now it is time to start talking about the actual router OS. For this, I chose OpenBSD. OpenBSD is a popular flavor of BSD that&#x27;s known for security. Given BSD&#x27;s general reputation as a networking appliance operating system, OpenBSD seemed like a good fit for the job.&lt;&#x2F;p&gt;
+&lt;p&gt;Below (in exhaustive detail) are my installation instructions for OpenBSD 6.6. I decided to make an encrypted disk (why not?) and a custom partitioning strategy. Refer to the OpenBSD docs for additional information.&lt;&#x2F;p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;Create an OpenBSD 6.6 installer USB drive.&lt;&#x2F;p&gt;
+&lt;&#x2F;li&gt;
+&lt;li&gt;
+&lt;p&gt;Boot the apu2 from the OpenBSD installer USB drive.&lt;&#x2F;p&gt;
+&lt;p&gt;At the &lt;code&gt;boot&amp;gt;&lt;&#x2F;code&gt; prompt, configure and enable a serial tty by entering the following commands.&lt;&#x2F;p&gt;
+&lt;pre style=&quot;background-color:#2b303b;&quot;&gt;
+&lt;span style=&quot;color:#c0c5ce;&quot;&gt;stty com0 115200
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;set tty com0
+&lt;&#x2F;span&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;Now, press enter at the &lt;code&gt;boot&amp;gt;&lt;&#x2F;code&gt; prompt to boot the installer.&lt;&#x2F;p&gt;
+&lt;&#x2F;li&gt;
+&lt;li&gt;
+&lt;p&gt;After the installer boots up, type &lt;code&gt;s&lt;&#x2F;code&gt; to run a shell.&lt;&#x2F;p&gt;
+&lt;&#x2F;li&gt;
+&lt;li&gt;
+&lt;p&gt;Erase the target installation disk.&lt;&#x2F;p&gt;
+&lt;p&gt;To determine the identifier for the target installation disk, check &lt;code&gt;dmesg&lt;&#x2F;code&gt; (In was sd0 in my case).&lt;&#x2F;p&gt;
+&lt;pre style=&quot;background-color:#2b303b;&quot;&gt;
+&lt;span style=&quot;color:#c0c5ce;&quot;&gt;cd &#x2F;dev &amp;amp;&amp;amp; sh MAKEDEV sd0
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;dd if=&#x2F;dev&#x2F;urandom of=&#x2F;dev&#x2F;rsd0c bs=1m
+&lt;&#x2F;span&gt;&lt;&#x2F;pre&gt;&lt;&#x2F;li&gt;
+&lt;li&gt;
+&lt;p&gt;Setup the disk MBR.&lt;&#x2F;p&gt;
+&lt;pre style=&quot;background-color:#2b303b;&quot;&gt;
+&lt;span style=&quot;color:#c0c5ce;&quot;&gt;fdisk -iy sd0
+&lt;&#x2F;span&gt;&lt;&#x2F;pre&gt;&lt;&#x2F;li&gt;
+&lt;li&gt;
+&lt;p&gt;Create a RAID partition to use as an encrypted pseudo-device.&lt;&#x2F;p&gt;
+&lt;p&gt;Run the disk label editor.&lt;&#x2F;p&gt;
+&lt;pre style=&quot;background-color:#2b303b;&quot;&gt;
+&lt;span style=&quot;color:#c0c5ce;&quot;&gt;disklabel -E sd0
+&lt;&#x2F;span&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;In the disk label editor, enter the following commands to create a RAID partition over the entire disk.&lt;&#x2F;p&gt;
+&lt;pre style=&quot;background-color:#2b303b;&quot;&gt;
+&lt;span style=&quot;color:#c0c5ce;&quot;&gt;a a
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;&amp;lt;enter&amp;gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;&amp;lt;enter&amp;gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;RAID
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;p
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;w
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;q
+&lt;&#x2F;span&gt;&lt;&#x2F;pre&gt;&lt;&#x2F;li&gt;
+&lt;li&gt;
+&lt;p&gt;Create the encrypted pseudo-device and set the encryption password.&lt;&#x2F;p&gt;
+&lt;pre style=&quot;background-color:#2b303b;&quot;&gt;
+&lt;span style=&quot;color:#c0c5ce;&quot;&gt;bioctl -c C -l sd0a softraid0
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;# use the device identifier created in the previous command (sd3 for me)
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;cd &#x2F;dev &amp;amp;&amp;amp; sh MAKEDEV sd3
+&lt;&#x2F;span&gt;&lt;&#x2F;pre&gt;&lt;&#x2F;li&gt;
+&lt;li&gt;
+&lt;p&gt;Clear the first megabyte of the new pseudo-device.&lt;&#x2F;p&gt;
+&lt;p&gt;If you&#x27;re unlucky, the random data written to the device may look like a real disk header. Clearing out the first megabyte fixes this potential issue.&lt;&#x2F;p&gt;
+&lt;pre style=&quot;background-color:#2b303b;&quot;&gt;
+&lt;span style=&quot;color:#c0c5ce;&quot;&gt;dd if=&#x2F;dev&#x2F;zero of=&#x2F;dev&#x2F;rsd3c bs=1m count=1
+&lt;&#x2F;span&gt;&lt;&#x2F;pre&gt;&lt;&#x2F;li&gt;
+&lt;li&gt;
+&lt;p&gt;Return to the main installer menu.&lt;&#x2F;p&gt;
+&lt;pre style=&quot;background-color:#2b303b;&quot;&gt;
+&lt;span style=&quot;color:#c0c5ce;&quot;&gt;exit
+&lt;&#x2F;span&gt;&lt;&#x2F;pre&gt;&lt;&#x2F;li&gt;
+&lt;li&gt;
+&lt;p&gt;Type &lt;code&gt;i&lt;&#x2F;code&gt; to run the installer.&lt;&#x2F;p&gt;
+&lt;pre style=&quot;background-color:#2b303b;&quot;&gt;
+&lt;span style=&quot;color:#c0c5ce;&quot;&gt;Terminal type? &amp;lt;enter&amp;gt; (the default seemed to work fine for me)
+&lt;&#x2F;span&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;Next, set the system hostname and configure the network interfaces.&lt;&#x2F;p&gt;
+&lt;pre style=&quot;background-color:#2b303b;&quot;&gt;
+&lt;span style=&quot;color:#c0c5ce;&quot;&gt;System hostname? firewall (in my case)
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;Which nic to configure? em0 (this will be the WAN interface)
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;IPv4 address? 192.168.0.2 (in my case)
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;Netmask? 255.255.255.0 (in my case)
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;IPv6 address? none (in my case)
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;Which nic to configure? em1 (this will be the &amp;quot;prod&amp;quot; network interface)
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;Symbolic hostname? &amp;lt;enter&amp;gt; (same as system hostname)
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;IPv4 address? 192.168.1.1 (in my case)
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;Netmask? 255.255.255.0 (in my case)
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;IPv6 address? none (in my case)
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;Which nic to configure? em2 (this will be the &amp;quot;dev&amp;quot; network interface&amp;quot;)
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;Symbolic hostname? &amp;lt;enter&amp;gt; (same as system hostname)
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;IPv4 address? 192.168.2.1 (in my case)
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;Netmask? 255.255.255.0 (in my case)
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;IPv6 address? none (in my case)
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;Which nic to configure? done
+&lt;&#x2F;span&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;Next, set the default route and configure DNS.&lt;&#x2F;p&gt;
+&lt;pre style=&quot;background-color:#2b303b;&quot;&gt;
+&lt;span style=&quot;color:#c0c5ce;&quot;&gt;Default route? 192.168.0.1 (in my case)
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;DNS domain name? localdomain (in my case)
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;DNS nameservers? 8.8.8.8 8.8.4.4 (for now)
+&lt;&#x2F;span&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;Next, there are some miscellaneous tasks: set the root password, enable ssh, setup serial console, create a user, and set your timezone.&lt;&#x2F;p&gt;
+&lt;pre style=&quot;background-color:#2b303b;&quot;&gt;
+&lt;span style=&quot;color:#c0c5ce;&quot;&gt;Password for root account? (something secure)
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;Start sshd by default? yes (not necessary, but useful)
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;Change default console to com0? yes
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;Which speed should com0 use? 115200
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;Setup a user? (choose a username)
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;Full name? &amp;lt;enter&amp;gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;Password? (something secure)
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;Allow root ssh login? no
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;What timezone? (set your timezone)
+&lt;&#x2F;span&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;Next, partition your target installation disk (the encrypted pseudo-device).&lt;&#x2F;p&gt;
+&lt;pre style=&quot;background-color:#2b303b;&quot;&gt;
+&lt;span style=&quot;color:#c0c5ce;&quot;&gt;Which disk is the root disk? sd3 (pseudo-device from previous steps)
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;Whole disk MBR? whole
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;Disk partitioning? c (setup custom layout)
+&lt;&#x2F;span&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;Here are the commands I used to partition my disk.&lt;&#x2F;p&gt;
+&lt;pre style=&quot;background-color:#2b303b;&quot;&gt;
+&lt;span style=&quot;color:#c0c5ce;&quot;&gt;a a
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;&amp;lt;enter&amp;gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;6G
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;&amp;lt;enter&amp;gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;&#x2F;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;a b
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;&amp;lt;enter&amp;gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;4G
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;&amp;lt;enter&amp;gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;a d
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;&amp;lt;enter&amp;gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;0.1G
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;&amp;lt;enter&amp;gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;&#x2F;usr&#x2F;local
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;a e
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;&amp;lt;enter&amp;gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;4G
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;&amp;lt;enter&amp;gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;&#x2F;var
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;a f
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;&amp;lt;enter&amp;gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;&amp;lt;enter&amp;gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;&amp;lt;enter&amp;gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;&#x2F;tmp
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;p
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;w
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;q
+&lt;&#x2F;span&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;My disk ended up being partitioned as follows:&lt;&#x2F;p&gt;
+&lt;pre style=&quot;background-color:#2b303b;&quot;&gt;
+&lt;span style=&quot;color:#c0c5ce;&quot;&gt;#   size       offset     fstype   [fsize   bsize   cpg]
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;a:  12594880   64         4.2BSD    2048    16384   1      # &#x2F;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;b:  8402011    12594944   swap
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;c:  31261898   0          unused
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;d:  224896     20996960   4.2BSD    2048    16384   1      # &#x2F;usr&#x2F;local
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;e:  8401984    21221856   4.2BSD    2048    16384   1      # &#x2F;var
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;f:  1622560    29623840   4.2BSD    2048    16384   1      # &#x2F;tmp
+&lt;&#x2F;span&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;Finish partitioning disks.&lt;&#x2F;p&gt;
+&lt;pre style=&quot;background-color:#2b303b;&quot;&gt;
+&lt;span style=&quot;color:#c0c5ce;&quot;&gt;Which disk to initialize? done
+&lt;&#x2F;span&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;Before installing the sets, type &lt;code&gt;!&lt;&#x2F;code&gt; to exit to a shell and determine the device identifier of the OpenBSD 6.6 installer USB drive. Then, return to the installer.&lt;&#x2F;p&gt;
+&lt;pre style=&quot;background-color:#2b303b;&quot;&gt;
+&lt;span style=&quot;color:#c0c5ce;&quot;&gt;!
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;dmesg  # for me, the device identifier ended up being sd2
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;exit
+&lt;&#x2F;span&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;Next, mount the OpenBSD 6.6 installer USB drive and load the sets.&lt;&#x2F;p&gt;
+&lt;pre style=&quot;background-color:#2b303b;&quot;&gt;
+&lt;span style=&quot;color:#c0c5ce;&quot;&gt;Location of sets? disk
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;Already mounted? no
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;Which disk contains the install media? sd2 (as just determined)
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;Which partition has the install sets? &amp;lt;enter&amp;gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;Pathname to the sets? &amp;lt;enter&amp;gt;
+&lt;&#x2F;span&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;Next, select which sets to install and install them.&lt;&#x2F;p&gt;
+&lt;pre style=&quot;background-color:#2b303b;&quot;&gt;
+&lt;span style=&quot;color:#c0c5ce;&quot;&gt;Set name(s)? -game* -x* (no need for games or a gui)
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;Set name(s)? done
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;Continue without verification? yes
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;Location of sets? done
+&lt;&#x2F;span&gt;&lt;&#x2F;pre&gt;&lt;&#x2F;li&gt;
+&lt;&#x2F;ol&gt;
+&lt;p&gt;Success! Reboot the device. Don&#x27;t forget to run &lt;code&gt;syspatch&lt;&#x2F;code&gt; after rebooting in order to apply the latest patches.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;firewall-pf&quot;&gt;Firewall (pf)&lt;&#x2F;h2&gt;
+&lt;p&gt;Now that we have an apu2 running the latest firmware and OpenBSD, it&#x27;s time to turn this thing into a router. With OpenBSD, you don&#x27;t even have to install anything extra in order to make this happen. Everything you need already comes with the basic OS installation.&lt;&#x2F;p&gt;
+&lt;p&gt;For my home network, I want two subnets, which I refer to as dev and prod. The dev subnet is an experimental and development zone where I can break things. The prod subnet contains the devices I use on a day-to-day basis. I want both the dev and prod subnets to be able to access the external internet, but I want to block communication between the two subnets. Devices in the dev subnet should not be able to communicate with devices in the prod subnet (and vice versa). Fortunately, the apu2 has three physical NICs. So, one NIC could be used for the WAN network, one NIC could be used for the dev network, and one NIC could be used for the prod network.&lt;&#x2F;p&gt;
+&lt;p&gt;To learn how to configure the pf firewall and make this setup a reality, I read the &lt;a href=&quot;https:&#x2F;&#x2F;man.openbsd.org&#x2F;pf.conf&quot;&gt;pf.conf man page&lt;&#x2F;a&gt; and the &lt;a href=&quot;https:&#x2F;&#x2F;www.openbsd.org&#x2F;faq&#x2F;pf&#x2F;example1.html&quot;&gt;router tutorial&lt;&#x2F;a&gt;. There are three main differences between my configuration and the one described in the tutorial.&lt;&#x2F;p&gt;
+&lt;ol&gt;
+&lt;li&gt;My configuration has two subnets that are not allowed to talk to each other.&lt;&#x2F;li&gt;
+&lt;li&gt;My configuration prevents outgoing unencrypted DNS traffic.&lt;&#x2F;li&gt;
+&lt;li&gt;My router exists on a local network (behind my ISP-supplied modem&#x2F;router) so I had to allow traffic destined to the gateway at 192.168.0.1.&lt;&#x2F;li&gt;
+&lt;&#x2F;ol&gt;
+&lt;p&gt;Here is my &#x2F;etc&#x2F;pf.conf that achieves this desired configuration.&lt;&#x2F;p&gt;
+&lt;pre style=&quot;background-color:#2b303b;&quot;&gt;
+&lt;span style=&quot;color:#c0c5ce;&quot;&gt;# interfaces
+lo_if = &amp;quot;lo0&amp;quot;
+wan_if = &amp;quot;em0&amp;quot;
+prod_if = &amp;quot;em1&amp;quot;
+dev_if = &amp;quot;em2&amp;quot;
+
+# cidr ranges
+prod_range = &amp;quot;192.168.1.0&#x2F;24&amp;quot;
+dev_range = &amp;quot;192.168.2.0&#x2F;24&amp;quot;
+
+# setup non-routable address list
+# note: since this firewall is behind a local network,
+#       do not include the default gateway in the table
+table &amp;lt;martians&amp;gt; { 0.0.0.0&#x2F;8 10.0.0.0&#x2F;8 127.0.0.0&#x2F;8 169.254.0.0&#x2F;16     \
+                   172.16.0.0&#x2F;12 192.0.0.0&#x2F;24 192.0.2.0&#x2F;24 224.0.0.0&#x2F;3 \
+                   192.168.0.0&#x2F;16 198.18.0.0&#x2F;15 198.51.100.0&#x2F;24        \
+                   203.0.113.0&#x2F;24 !192.168.0.1 }
+
+# drop blocked traffic
+set block-policy drop
+# set interface for logging
+set loginterface $wan_if
+# ignore loopback traffic
+set skip on $lo_if
+
+# normalize incoming packets
+match in all scrub (no-df random-id max-mss 1460)
+# perform NAT
+match out on $wan_if inet from !($wan_if:network) to any nat-to ($wan_if:0)
+
+# prevent spoofed traffic
+antispoof quick for { $wan_if $prod_if $dev_if }
+
+# block non-routable traffic
+block in quick on $wan_if from &amp;lt;martians&amp;gt; to any
+block return out quick on $wan_if from any to &amp;lt;martians&amp;gt;
+
+# block all traffic
+block all
+# allow outgoing traffic
+pass out inet
+# allow traffic from internal networks
+pass in on { $prod_if $dev_if } inet
+# block traffic from prod &amp;lt;--&amp;gt; dev
+block in on $prod_if from $prod_range to $dev_range
+block in on $dev_if from $dev_range to $prod_range
+# block outgoing unencrypted dns requests
+block proto { TCP UDP } from { $prod_range $dev_range } to any port 53
+pass proto { TCP UDP } from { $prod_range $dev_range} to self port 53
+&lt;&#x2F;span&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;Next, in order to perform NAT (to make this device an actual router), run the following:&lt;&#x2F;p&gt;
+&lt;pre style=&quot;background-color:#2b303b;&quot;&gt;
+&lt;span style=&quot;color:#c0c5ce;&quot;&gt;echo &amp;#39;net.inet.ip.forwarding=1&amp;#39; &amp;gt;&amp;gt; &#x2F;etc&#x2F;sysctl.conf
+&lt;&#x2F;span&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;Finally, reboot with &lt;code&gt;reboot -p&lt;&#x2F;code&gt;. Now, the router is functional and secured with the pf firewall. At this point, it will work as a minimum viable product. However, every device on the network will need to manually configure its own static IP address, subnet mask, gateway, and DNS server (because there is no DHCP service running to supply these configuration details).&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;dhcp-dhcpd&quot;&gt;DHCP (dhcpd)&lt;&#x2F;h2&gt;
+&lt;p&gt;DHCP is a service that (among other things) gives IP addresses to the devices on your network. So when a device joins the network, it will be given an IP address by the DHCP server running on the router. The DHCP server bundled with OpenBSD 6.6 is dhcpd.&lt;&#x2F;p&gt;
+&lt;p&gt;Most devices, upon joining the network, will be given an IP address from within a specified IP range. They could potentially receive any IP address in this range. However, I wanted some devices to be treated specially and always be given the same IP addresses by dhcpd. That way, I can rely on those devices to have predictable IP addresses. It is simpler and easier to define &amp;quot;static&amp;quot; IP addresses all in one place (on the router) rather than configure static IP addresses on each individual device. This way, every IP on my network is defined in one place, on the router. It will be obvious if two devices are configured to have the same static IP (a classic mistake).&lt;&#x2F;p&gt;
+&lt;p&gt;In addition to defining the IP address allocations in my network, I configured dhcpd to inform devices on my network of the preferred DNS server for the network, the router itself. We haven&#x27;t set this up yet, but the router will also function as a caching DNS server.&lt;&#x2F;p&gt;
+&lt;p&gt;Here is an example &#x2F;etc&#x2F;dhcpd.conf file:&lt;&#x2F;p&gt;
+&lt;pre style=&quot;background-color:#2b303b;&quot;&gt;
+&lt;span style=&quot;color:#c0c5ce;&quot;&gt;# prod network
+subnet 192.168.1.0 netmask 255.255.255.0 {
+        option routers 192.168.1.1;
+        option domain-name-servers 192.168.1.1;
+        range 192.168.1.100 192.168.1.149;
+        host special-device-1 {
+                fixed-address 192.168.1.2;
+                hardware ethernet 00:00:00:00:00:00;
+        }
+}
+# dev network
+subnet 192.168.2.0 netmask 255.255.255.0 {
+        option routers 192.168.2.1;
+        option domain-name-servers 192.168.2.1;
+        range 192.168.2.100 192.168.2.199;
+        host special-device-2 {
+                fixed-address 192.168.2.2;
+                hardware ethernet 11:11:11:11:11:11;
+        }
+}
+&lt;&#x2F;span&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;This &#x2F;etc&#x2F;dhcpd.conf file configures the dhcpd server to hand out IP addresses for the dev and prod networks from within the specified ranges. In addition, it informs devices of the local DNS server (not yet configured). It also configures two &amp;quot;special devices&amp;quot; that will always be given the same IP addresses. dhcpd identifies these two devices by their MAC addresses. For more information check out the &lt;a href=&quot;https:&#x2F;&#x2F;man.openbsd.org&#x2F;dhcpd.conf.5&quot;&gt;dhcpd.conf man page&lt;&#x2F;a&gt;.&lt;&#x2F;p&gt;
+&lt;p&gt;To enable dhcpd on the em1 and em2 interfaces, run:&lt;&#x2F;p&gt;
+&lt;pre style=&quot;background-color:#2b303b;&quot;&gt;
+&lt;span style=&quot;color:#c0c5ce;&quot;&gt;rcctl enable dhcpd
+rcctl set dhcpd flags em1 em2
+&lt;&#x2F;span&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;Now, the DHCP server is running, automatically handing out IP addresses and network configuration details to new devices that join the network.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;dns-unbound&quot;&gt;DNS (unbound)&lt;&#x2F;h2&gt;
+&lt;p&gt;The last piece (for now) of this home router is DNS. Setting up a caching DNS server on the home router offers several benefits.&lt;&#x2F;p&gt;
+&lt;ol&gt;
+&lt;li&gt;DNS lookups, if they are already cached, will be quicker. The router will immediately reply with the answer. There will be no need to make a request to some external DNS server on the internet.&lt;&#x2F;li&gt;
+&lt;li&gt;By ensuring all outgoing DNS lookups are performed by the router, it is easy to enforce a standard of security &#x2F; privacy. I have configured the DNS caching server running on the router to always encrypt outgoing DNS requests. Of course, any device on the network is free to use other DNS servers besides the router. However, the pf firewall configuration blocks outgoing requests on port 53, the port commonly used for unencrypted DNS.&lt;&#x2F;li&gt;
+&lt;li&gt;It is possible to configure custom DNS entries for the local network. The &amp;quot;special devices&amp;quot; configured in the DHCP server to always have the same IP addresses can be given DNS entries on the local network. For example, if I have a server running on my home network, I can give it a memorable DNS entry that will always resolve to its &amp;quot;static&amp;quot; IP address defined in the DHCP configuration.&lt;&#x2F;li&gt;
+&lt;&#x2F;ol&gt;
+&lt;p&gt;Here is an example unbound config file (located at &#x2F;var&#x2F;unbound&#x2F;etc&#x2F;unbound.conf):&lt;&#x2F;p&gt;
+&lt;pre style=&quot;background-color:#2b303b;&quot;&gt;
+&lt;span style=&quot;color:#c0c5ce;&quot;&gt;server:
+        interface: 127.0.0.1
+        interface: 192.168.1.1
+        interface: 192.168.2.1
+        access-control: 127.0.0.0&#x2F;8 allow
+        access-control: 192.168.1.0&#x2F;24 allow
+        access-control: 192.168.2.0&#x2F;24 allow
+        hide-identity: yes
+        hide-version: yes
+        do-not-query-localhost: no
+        tls-cert-bundle: &amp;quot;&#x2F;etc&#x2F;ssl&#x2F;cert.pem&amp;quot;
+        local-data: &amp;quot;special-device-1.localdomain A 192.168.1.2&amp;quot;
+        local-data: &amp;quot;special-device-2.localdomain A 192.168.2.2&amp;quot;
+
+forward-zone:
+        name: &amp;quot;.&amp;quot;
+        forward-tls-upstream: yes
+        forward-addr: 8.8.8.8@853
+        forward-addr: 8.8.4.4@853
+&lt;&#x2F;span&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;To enable the unbound DNS caching server, run:&lt;&#x2F;p&gt;
+&lt;pre style=&quot;background-color:#2b303b;&quot;&gt;
+&lt;span style=&quot;color:#c0c5ce;&quot;&gt;rcctl enable unbound
+&lt;&#x2F;span&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;Now, the DNS caching server is running. Devices that join the network will automatically use this DNS server (unless otherwise configured) because the DHCP server will inform new devices that this is the preferred DNS server for the network. Also, by using this DNS server, the custom local DNS entries will resolve properly. For example, when any device on the local network makes a DNS lookup for &lt;code&gt;special-device-1.localdoman&lt;&#x2F;code&gt;, it resolves to 192.168.1.2. Lastly, all DNS lookups are cached by the unbound service. This will improve the latency of repeat DNS lookups.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;conclusion&quot;&gt;Conclusion&lt;&#x2F;h2&gt;
+&lt;p&gt;So, that&#x27;s pretty much it. At this point, the device functions as a router, firewall, DHCP server, and caching DNS server. The software it runs is entirely open source. It maintains several custom DNS entries for services running on my local network. Every outgoing DNS request is guaranteed to be encrypted. For the past few months, I have used this device in my home network and it has been working great. It is secure, performant, minimal, and easy to maintain (only three config files).&lt;&#x2F;p&gt;
+&lt;p&gt;In the future, I will likely add more features to this device. It might be useful to add a VPN service in order to allow me to access my home network from anywhere on the internet. Also, it would be neat to setup some logging &#x2F; metrics collection to analyze network traffic. However, at this point, all of the original project goals have been met. There are probably many easier ways to build a home router, but I learned a lot doing it this way. For now, I am quite happy with this device.&lt;&#x2F;p&gt;
+</description>
+            </item>
+        
+    </channel>
+</rss>

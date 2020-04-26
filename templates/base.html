@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="author" content="{{ config.extra.author }}">
+    <meta name="description" content="{{ config.description }}">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <link rel="icon" href="{{ get_url(path="/favicon.ico") | safe}}" type="image/x-icon">
+    <link rel="stylesheet" href="{{ get_url(path="/style.css") | safe }}">
+    <title>{% block title %}{% endblock title %}</title>
+</head>
+<body>
+<nav>
+    <a href="{{ get_url(path="@/_index.md") | safe }}">
+        <div class="logo">
+            <img src="{{ get_url(path="/logo.svg") | safe }}" alt="logo">
+        </div>
+    </a>
+    <ul>
+        <li><a href="{{ get_url(path="@/_index.md") | safe }}">home</a></li>
+        <li><a href="{{ get_url(path="@/about.md") | safe }}">about</a></li>
+        <li><a href="{{ get_url(path="@/blog/_index.md") | safe }}">blog</a></li>
+    </ul>
+</nav>
+{%- block content %}{% endblock content -%}
+</body>
+</html>
