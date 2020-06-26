@@ -98,8 +98,8 @@
 <p>First, I needed an actual machine for my home network appliance. After considering the various options (purchase a device, build something myself, use a virtual machine, etc.) I decided to use an <a href="https://pcengines.ch/apu2.htm">apu2</a>. It is a low-power, relatively inexpensive yet performant solution, which makes it ideal for this kind of application. In addition, it uses an open source BIOS (<a href="https://github.com/pcengines/seabios">SeaBIOS</a>) and firmware (<a href="https://github.com/pcengines/coreboot">coreboot</a>). I went with a model that has a quad-core processor, 4GB memory, and 3 separate gigabit NICs. In addition, I purchased a 16GB M-SATA SSD (for the main OS installation), a 4GB SD (for a utility OS installation), a case, and a serial cable (the apu2 does not have a port for graphics output). The total cost was roughly $160.</p>
 <p>After the device arrived, the first challenge was connecting to it. Ok, it wasn't actually that challenging. I connected to the apu2 with my OpenBSD netbook and the serial cable:</p>
 <pre style="background-color:#2b303b;">
-<span style="color:#c0c5ce;">cu -l /dev/cuaU0 -s 115200
-</span></pre>
+<code><span style="color:#c0c5ce;">cu -l /dev/cuaU0 -s 115200
+</span></code></pre>
 <p>No matter which software you use to connect to the apu2 over serial, the important setting is the default baud rate, 115200.</p>
 <h2 id="firmware-coreboot">Firmware (coreboot)</h2>
 <p>After booting up the apu2, I noticed that the BIOS was a bit out of date. It was probably flashed with the current BIOS version at the time of manufacturing, which was likely a while before it ended up in my hands. So, I needed to upgrade the BIOS. The <a href="https://pcengines.ch/howto.htm#bios">official instructions</a> describe a method to update the BIOS using a PC Engines custom TinyCore Linux distribution. However, since I was already planning to make two different boot disks, one for the router OS and one for a &quot;utility&quot; OS, I decided to setup the utility OS and make it capable of flashing the BIOS.</p>
@@ -125,19 +125,19 @@
 </ul>
 <p>In order to boot the new Debian installation for the first time, I had to manually edit the boot entry. Like before, add <code>console=ttyS0,115200n8</code> to boot into a serial tty. Then, after booting and logging in as root, I configured grub so that it would no longer be necessary to manually edit the boot entry. To do that, edit /etc/default/grub and change the following settings:</p>
 <pre style="background-color:#2b303b;">
-<span style="color:#c0c5ce;">GRUB_CMDLINE_LINUX=&#39;console=ttyS0,19200n8&#39;
+<code><span style="color:#c0c5ce;">GRUB_CMDLINE_LINUX=&#39;console=ttyS0,19200n8&#39;
 GRUB_TERMINAL=serial
-</span></pre>
+</span></code></pre>
 <p>Finally, run <code>update-grub</code> to regenerate the grub boot menu. At this point, the Debian &quot;utility&quot; OS install is complete and it is time to update the BIOS.</p>
 <h3 id="firmware-update">Firmware Update</h3>
 <p>Updating the BIOS is fairly simple. First, install the flashrom utility. It's available in the Debian package repositories.</p>
 <pre style="background-color:#2b303b;">
-<span style="color:#c0c5ce;">apt install flashrom
-</span></pre>
+<code><span style="color:#c0c5ce;">apt install flashrom
+</span></code></pre>
 <p>Then, download the latest mainline version of the firmware from <a href="https://pcengines.github.io/">https://pcengines.github.io/</a>, write the file to a USB, and mount the USB on the apu2. To flash the firmware (assuming the file is named coreboot.rom), run:</p>
 <pre style="background-color:#2b303b;">
-<span style="color:#c0c5ce;">flashrom -w coreboot.rom -p internal
-</span></pre>
+<code><span style="color:#c0c5ce;">flashrom -w coreboot.rom -p internal
+</span></code></pre>
 <p>Then, reboot. For more information on flashing the apu2 firmware, check out the <a href="https://github.com/pcengines/apu2-documentation/blob/master/docs/firmware_flashing.md">docs</a>.</p>
 <h2 id="os-openbsd">OS (OpenBSD)</h2>
 <p>Ok, now it is time to start talking about the actual router OS. For this, I chose OpenBSD. OpenBSD is a popular flavor of BSD that's known for security. Given BSD's general reputation as a networking appliance operating system, OpenBSD seemed like a good fit for the job.</p>
@@ -150,9 +150,9 @@ GRUB_TERMINAL=serial
 <p>Boot the apu2 from the OpenBSD installer USB drive.</p>
 <p>At the <code>boot&gt;</code> prompt, configure and enable a serial tty by entering the following commands.</p>
 <pre style="background-color:#2b303b;">
-<span style="color:#c0c5ce;">stty com0 115200
+<code><span style="color:#c0c5ce;">stty com0 115200
 </span><span style="color:#c0c5ce;">set tty com0
-</span></pre>
+</span></code></pre>
 <p>Now, press enter at the <code>boot&gt;</code> prompt to boot the installer.</p>
 </li>
 <li>
@@ -162,56 +162,56 @@ GRUB_TERMINAL=serial
 <p>Erase the target installation disk.</p>
 <p>To determine the identifier for the target installation disk, check <code>dmesg</code> (In was sd0 in my case).</p>
 <pre style="background-color:#2b303b;">
-<span style="color:#c0c5ce;">cd /dev &amp;&amp; sh MAKEDEV sd0
+<code><span style="color:#c0c5ce;">cd /dev &amp;&amp; sh MAKEDEV sd0
 </span><span style="color:#c0c5ce;">dd if=/dev/urandom of=/dev/rsd0c bs=1m
-</span></pre></li>
+</span></code></pre></li>
 <li>
 <p>Setup the disk MBR.</p>
 <pre style="background-color:#2b303b;">
-<span style="color:#c0c5ce;">fdisk -iy sd0
-</span></pre></li>
+<code><span style="color:#c0c5ce;">fdisk -iy sd0
+</span></code></pre></li>
 <li>
 <p>Create a RAID partition to use as an encrypted pseudo-device.</p>
 <p>Run the disk label editor.</p>
 <pre style="background-color:#2b303b;">
-<span style="color:#c0c5ce;">disklabel -E sd0
-</span></pre>
+<code><span style="color:#c0c5ce;">disklabel -E sd0
+</span></code></pre>
 <p>In the disk label editor, enter the following commands to create a RAID partition over the entire disk.</p>
 <pre style="background-color:#2b303b;">
-<span style="color:#c0c5ce;">a a
+<code><span style="color:#c0c5ce;">a a
 </span><span style="color:#c0c5ce;">&lt;enter&gt;
 </span><span style="color:#c0c5ce;">&lt;enter&gt;
 </span><span style="color:#c0c5ce;">RAID
 </span><span style="color:#c0c5ce;">p
 </span><span style="color:#c0c5ce;">w
 </span><span style="color:#c0c5ce;">q
-</span></pre></li>
+</span></code></pre></li>
 <li>
 <p>Create the encrypted pseudo-device and set the encryption password.</p>
 <pre style="background-color:#2b303b;">
-<span style="color:#c0c5ce;">bioctl -c C -l sd0a softraid0
+<code><span style="color:#c0c5ce;">bioctl -c C -l sd0a softraid0
 </span><span style="color:#c0c5ce;"># use the device identifier created in the previous command (sd3 for me)
 </span><span style="color:#c0c5ce;">cd /dev &amp;&amp; sh MAKEDEV sd3
-</span></pre></li>
+</span></code></pre></li>
 <li>
 <p>Clear the first megabyte of the new pseudo-device.</p>
 <p>If you're unlucky, the random data written to the device may look like a real disk header. Clearing out the first megabyte fixes this potential issue.</p>
 <pre style="background-color:#2b303b;">
-<span style="color:#c0c5ce;">dd if=/dev/zero of=/dev/rsd3c bs=1m count=1
-</span></pre></li>
+<code><span style="color:#c0c5ce;">dd if=/dev/zero of=/dev/rsd3c bs=1m count=1
+</span></code></pre></li>
 <li>
 <p>Return to the main installer menu.</p>
 <pre style="background-color:#2b303b;">
-<span style="color:#c0c5ce;">exit
-</span></pre></li>
+<code><span style="color:#c0c5ce;">exit
+</span></code></pre></li>
 <li>
 <p>Type <code>i</code> to run the installer.</p>
 <pre style="background-color:#2b303b;">
-<span style="color:#c0c5ce;">Terminal type? &lt;enter&gt; (the default seemed to work fine for me)
-</span></pre>
+<code><span style="color:#c0c5ce;">Terminal type? &lt;enter&gt; (the default seemed to work fine for me)
+</span></code></pre>
 <p>Next, set the system hostname and configure the network interfaces.</p>
 <pre style="background-color:#2b303b;">
-<span style="color:#c0c5ce;">System hostname? firewall (in my case)
+<code><span style="color:#c0c5ce;">System hostname? firewall (in my case)
 </span><span style="color:#c0c5ce;">Which nic to configure? em0 (this will be the WAN interface)
 </span><span style="color:#c0c5ce;">IPv4 address? 192.168.0.2 (in my case)
 </span><span style="color:#c0c5ce;">Netmask? 255.255.255.0 (in my case)
@@ -227,16 +227,16 @@ GRUB_TERMINAL=serial
 </span><span style="color:#c0c5ce;">Netmask? 255.255.255.0 (in my case)
 </span><span style="color:#c0c5ce;">IPv6 address? none (in my case)
 </span><span style="color:#c0c5ce;">Which nic to configure? done
-</span></pre>
+</span></code></pre>
 <p>Next, set the default route and configure DNS.</p>
 <pre style="background-color:#2b303b;">
-<span style="color:#c0c5ce;">Default route? 192.168.0.1 (in my case)
+<code><span style="color:#c0c5ce;">Default route? 192.168.0.1 (in my case)
 </span><span style="color:#c0c5ce;">DNS domain name? localdomain (in my case)
 </span><span style="color:#c0c5ce;">DNS nameservers? 8.8.8.8 8.8.4.4 (for now)
-</span></pre>
+</span></code></pre>
 <p>Next, there are some miscellaneous tasks: set the root password, enable ssh, setup serial console, create a user, and set your timezone.</p>
 <pre style="background-color:#2b303b;">
-<span style="color:#c0c5ce;">Password for root account? (something secure)
+<code><span style="color:#c0c5ce;">Password for root account? (something secure)
 </span><span style="color:#c0c5ce;">Start sshd by default? yes (not necessary, but useful)
 </span><span style="color:#c0c5ce;">Change default console to com0? yes
 </span><span style="color:#c0c5ce;">Which speed should com0 use? 115200
@@ -245,16 +245,16 @@ GRUB_TERMINAL=serial
 </span><span style="color:#c0c5ce;">Password? (something secure)
 </span><span style="color:#c0c5ce;">Allow root ssh login? no
 </span><span style="color:#c0c5ce;">What timezone? (set your timezone)
-</span></pre>
+</span></code></pre>
 <p>Next, partition your target installation disk (the encrypted pseudo-device).</p>
 <pre style="background-color:#2b303b;">
-<span style="color:#c0c5ce;">Which disk is the root disk? sd3 (pseudo-device from previous steps)
+<code><span style="color:#c0c5ce;">Which disk is the root disk? sd3 (pseudo-device from previous steps)
 </span><span style="color:#c0c5ce;">Whole disk MBR? whole
 </span><span style="color:#c0c5ce;">Disk partitioning? c (setup custom layout)
-</span></pre>
+</span></code></pre>
 <p>Here are the commands I used to partition my disk.</p>
 <pre style="background-color:#2b303b;">
-<span style="color:#c0c5ce;">a a
+<code><span style="color:#c0c5ce;">a a
 </span><span style="color:#c0c5ce;">&lt;enter&gt;
 </span><span style="color:#c0c5ce;">6G
 </span><span style="color:#c0c5ce;">&lt;enter&gt;
@@ -281,42 +281,42 @@ GRUB_TERMINAL=serial
 </span><span style="color:#c0c5ce;">p
 </span><span style="color:#c0c5ce;">w
 </span><span style="color:#c0c5ce;">q
-</span></pre>
+</span></code></pre>
 <p>My disk ended up being partitioned as follows:</p>
 <pre style="background-color:#2b303b;">
-<span style="color:#c0c5ce;">#   size       offset     fstype   [fsize   bsize   cpg]
+<code><span style="color:#c0c5ce;">#   size       offset     fstype   [fsize   bsize   cpg]
 </span><span style="color:#c0c5ce;">a:  12594880   64         4.2BSD    2048    16384   1      # /
 </span><span style="color:#c0c5ce;">b:  8402011    12594944   swap
 </span><span style="color:#c0c5ce;">c:  31261898   0          unused
 </span><span style="color:#c0c5ce;">d:  224896     20996960   4.2BSD    2048    16384   1      # /usr/local
 </span><span style="color:#c0c5ce;">e:  8401984    21221856   4.2BSD    2048    16384   1      # /var
 </span><span style="color:#c0c5ce;">f:  1622560    29623840   4.2BSD    2048    16384   1      # /tmp
-</span></pre>
+</span></code></pre>
 <p>Finish partitioning disks.</p>
 <pre style="background-color:#2b303b;">
-<span style="color:#c0c5ce;">Which disk to initialize? done
-</span></pre>
+<code><span style="color:#c0c5ce;">Which disk to initialize? done
+</span></code></pre>
 <p>Before installing the sets, type <code>!</code> to exit to a shell and determine the device identifier of the OpenBSD 6.6 installer USB drive. Then, return to the installer.</p>
 <pre style="background-color:#2b303b;">
-<span style="color:#c0c5ce;">!
+<code><span style="color:#c0c5ce;">!
 </span><span style="color:#c0c5ce;">dmesg  # for me, the device identifier ended up being sd2
 </span><span style="color:#c0c5ce;">exit
-</span></pre>
+</span></code></pre>
 <p>Next, mount the OpenBSD 6.6 installer USB drive and load the sets.</p>
 <pre style="background-color:#2b303b;">
-<span style="color:#c0c5ce;">Location of sets? disk
+<code><span style="color:#c0c5ce;">Location of sets? disk
 </span><span style="color:#c0c5ce;">Already mounted? no
 </span><span style="color:#c0c5ce;">Which disk contains the install media? sd2 (as just determined)
 </span><span style="color:#c0c5ce;">Which partition has the install sets? &lt;enter&gt;
 </span><span style="color:#c0c5ce;">Pathname to the sets? &lt;enter&gt;
-</span></pre>
+</span></code></pre>
 <p>Next, select which sets to install and install them.</p>
 <pre style="background-color:#2b303b;">
-<span style="color:#c0c5ce;">Set name(s)? -game* -x* (no need for games or a gui)
+<code><span style="color:#c0c5ce;">Set name(s)? -game* -x* (no need for games or a gui)
 </span><span style="color:#c0c5ce;">Set name(s)? done
 </span><span style="color:#c0c5ce;">Continue without verification? yes
 </span><span style="color:#c0c5ce;">Location of sets? done
-</span></pre></li>
+</span></code></pre></li>
 </ol>
 <p>Success! Reboot the device. Don't forget to run <code>syspatch</code> after rebooting in order to apply the latest patches.</p>
 <h2 id="firewall-pf">Firewall (pf)</h2>
@@ -330,7 +330,7 @@ GRUB_TERMINAL=serial
 </ol>
 <p>Here is my /etc/pf.conf that achieves this desired configuration.</p>
 <pre style="background-color:#2b303b;">
-<span style="color:#c0c5ce;"># interfaces
+<code><span style="color:#c0c5ce;"># interfaces
 lo_if = &quot;lo0&quot;
 wan_if = &quot;em0&quot;
 prod_if = &quot;em1&quot;
@@ -379,11 +379,11 @@ block in on $dev_if from $dev_range to $prod_range
 # block outgoing unencrypted dns requests
 block proto { TCP UDP } from { $prod_range $dev_range } to any port 53
 pass proto { TCP UDP } from { $prod_range $dev_range} to self port 53
-</span></pre>
+</span></code></pre>
 <p>Next, in order to perform NAT (to make this device an actual router), run the following:</p>
 <pre style="background-color:#2b303b;">
-<span style="color:#c0c5ce;">echo &#39;net.inet.ip.forwarding=1&#39; &gt;&gt; /etc/sysctl.conf
-</span></pre>
+<code><span style="color:#c0c5ce;">echo &#39;net.inet.ip.forwarding=1&#39; &gt;&gt; /etc/sysctl.conf
+</span></code></pre>
 <p>Finally, reboot with <code>reboot -p</code>. Now, the router is functional and secured with the pf firewall. At this point, it will work as a minimum viable product. However, every device on the network will need to manually configure its own static IP address, subnet mask, gateway, and DNS server (because there is no DHCP service running to supply these configuration details).</p>
 <h2 id="dhcp-dhcpd">DHCP (dhcpd)</h2>
 <p>DHCP is a service that (among other things) gives IP addresses to the devices on your network. So when a device joins the network, it will be given an IP address by the DHCP server running on the router. The DHCP server bundled with OpenBSD 6.6 is dhcpd.</p>
@@ -391,7 +391,7 @@ pass proto { TCP UDP } from { $prod_range $dev_range} to self port 53
 <p>In addition to defining the IP address allocations in my network, I configured dhcpd to inform devices on my network of the preferred DNS server for the network, the router itself. We haven't set this up yet, but the router will also function as a caching DNS server.</p>
 <p>Here is an example /etc/dhcpd.conf file:</p>
 <pre style="background-color:#2b303b;">
-<span style="color:#c0c5ce;"># prod network
+<code><span style="color:#c0c5ce;"># prod network
 subnet 192.168.1.0 netmask 255.255.255.0 {
         option routers 192.168.1.1;
         option domain-name-servers 192.168.1.1;
@@ -411,13 +411,13 @@ subnet 192.168.2.0 netmask 255.255.255.0 {
                 hardware ethernet 11:11:11:11:11:11;
         }
 }
-</span></pre>
+</span></code></pre>
 <p>This /etc/dhcpd.conf file configures the dhcpd server to hand out IP addresses for the dev and prod networks from within the specified ranges. In addition, it informs devices of the local DNS server (not yet configured). It also configures two &quot;special devices&quot; that will always be given the same IP addresses. dhcpd identifies these two devices by their MAC addresses. For more information check out the <a href="https://man.openbsd.org/dhcpd.conf.5">dhcpd.conf man page</a>.</p>
 <p>To enable dhcpd on the em1 and em2 interfaces, run:</p>
 <pre style="background-color:#2b303b;">
-<span style="color:#c0c5ce;">rcctl enable dhcpd
+<code><span style="color:#c0c5ce;">rcctl enable dhcpd
 rcctl set dhcpd flags em1 em2
-</span></pre>
+</span></code></pre>
 <p>Now, the DHCP server is running, automatically handing out IP addresses and network configuration details to new devices that join the network.</p>
 <h2 id="dns-unbound">DNS (unbound)</h2>
 <p>The last piece (for now) of this home router is DNS. Setting up a caching DNS server on the home router offers several benefits.</p>
@@ -428,7 +428,7 @@ rcctl set dhcpd flags em1 em2
 </ol>
 <p>Here is an example unbound config file (located at /var/unbound/etc/unbound.conf):</p>
 <pre style="background-color:#2b303b;">
-<span style="color:#c0c5ce;">server:
+<code><span style="color:#c0c5ce;">server:
         interface: 127.0.0.1
         interface: 192.168.1.1
         interface: 192.168.2.1
@@ -447,11 +447,11 @@ forward-zone:
         forward-tls-upstream: yes
         forward-addr: 8.8.8.8@853
         forward-addr: 8.8.4.4@853
-</span></pre>
+</span></code></pre>
 <p>To enable the unbound DNS caching server, run:</p>
 <pre style="background-color:#2b303b;">
-<span style="color:#c0c5ce;">rcctl enable unbound
-</span></pre>
+<code><span style="color:#c0c5ce;">rcctl enable unbound
+</span></code></pre>
 <p>Now, the DNS caching server is running. Devices that join the network will automatically use this DNS server (unless otherwise configured) because the DHCP server will inform new devices that this is the preferred DNS server for the network. Also, by using this DNS server, the custom local DNS entries will resolve properly. For example, when any device on the local network makes a DNS lookup for <code>special-device-1.localdoman</code>, it resolves to 192.168.1.2. Lastly, all DNS lookups are cached by the unbound service. This will improve the latency of repeat DNS lookups.</p>
 <h2 id="conclusion">Conclusion</h2>
 <p>So, that's pretty much it. At this point, the device functions as a router, firewall, DHCP server, and caching DNS server. The software it runs is entirely open source. It maintains several custom DNS entries for services running on my local network. Every outgoing DNS request is guaranteed to be encrypted. For the past few months, I have used this device in my home network and it has been working great. It is secure, performant, minimal, and easy to maintain (only three config files).</p>

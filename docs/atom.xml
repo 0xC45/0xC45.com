@@ -1,20 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
-    <channel>
-        <title>0xC45</title>
-        <link>https://0xC45.com</link>
-        <description>0xC45 blog</description>
-        <generator>Zola</generator>
-        <language>en</language>
-        <atom:link href="https://0xC45.com/rss.xml" rel="self" type="application/rss+xml"/>
-        <lastBuildDate>Sun, 24 May 2020 00:00:00 +0000</lastBuildDate>
-        
-            <item>
-                <title>OpenSSL Certificate Authority</title>
-                <pubDate>Sun, 24 May 2020 00:00:00 +0000</pubDate>
-                <link>https://0xC45.com/blog/openssl-certificate-authority/</link>
-                <guid>https://0xC45.com/blog/openssl-certificate-authority/</guid>
-                <description>&lt;h2 id=&quot;overview&quot;&gt;Overview&lt;&#x2F;h2&gt;
+<feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en">
+	<title>0xC45</title>
+	<subtitle>0xC45 blog</subtitle>
+	<link href="https://0xC45.com/atom.xml" rel="self" type="application/atom+xml"/>
+	<link href="https://0xC45.com"/>
+	<generator uri="https://www.getzola.org/">Zola</generator>
+	<updated>2020-05-24T00:00:00+00:00</updated>
+	<id>https://0xC45.com/atom.xml</id>
+	<entry xml:lang="en">
+		<title>OpenSSL Certificate Authority</title>
+		<published>2020-05-24T00:00:00+00:00</published>
+		<updated>2020-05-24T00:00:00+00:00</updated>
+		<link href="https://0xC45.com/blog/openssl-certificate-authority/" type="text/html"/>
+		<id>https://0xC45.com/blog/openssl-certificate-authority/</id>
+		<content type="html">&lt;h2 id=&quot;overview&quot;&gt;Overview&lt;&#x2F;h2&gt;
 &lt;p&gt;At this point, HTTPS (HTTP encrypted with SSL&#x2F;TLS) is nearly ubiquitous across the internet. You could say that any website that doesn&#x27;t use HTTPS is behind the times. However, encrypting internet communications only achieves privacy from snooping third parties. In order to prevent &amp;quot;man in the middle&amp;quot; attacks, where an imposter pretends to represent the website you&#x27;re trying to visit (and tricks you into giving them your passwords, secret data, etc.), it&#x27;s also necessary to ensure that you&#x27;re actually communicating with the website that you think you&#x27;re communicating with. In other words, there needs to be a system in place that enables you to verify the identity of every website that you visit. The current system used on the internet involves certificates (objects that &amp;quot;prove&amp;quot; the identity of a website) and certificate authorities (entities that you trust).&lt;&#x2F;p&gt;
 &lt;h3 id=&quot;motivation&quot;&gt;Motivation&lt;&#x2F;h3&gt;
 &lt;p&gt;On my home network, I run a few HTTPS services for miscellaneous things. In the past, I have generated a one-off, &amp;quot;self-signed&amp;quot; certificate for each of these services and clicked through the browser warning about the untrusted, self-signed certificate that every service presented.&lt;&#x2F;p&gt;
@@ -37,11 +36,11 @@
 &lt;p&gt;By reading the default openssl config file (located at &lt;code&gt;&#x2F;etc&#x2F;ssl&#x2F;openssl.cnf&lt;&#x2F;code&gt; on my system) and the openssl manual pages related to certificate requests and authorities (&lt;a href=&quot;https:&#x2F;&#x2F;www.openssl.org&#x2F;docs&#x2F;man1.1.1&#x2F;man1&#x2F;req.html&quot;&gt;req&lt;&#x2F;a&gt;, &lt;a href=&quot;https:&#x2F;&#x2F;www.openssl.org&#x2F;docs&#x2F;man1.1.1&#x2F;man1&#x2F;ca.html&quot;&gt;ca&lt;&#x2F;a&gt;, and &lt;a href=&quot;https:&#x2F;&#x2F;www.openssl.org&#x2F;docs&#x2F;man1.1.1&#x2F;man5&#x2F;x509v3_config.html&quot;&gt;x509v3_config&lt;&#x2F;a&gt;), I learned about the configuration options and their meanings. Then, through some experimentation (trial and error), I made a basic openssl config file.&lt;&#x2F;p&gt;
 &lt;h4 id=&quot;request-configuration&quot;&gt;Request Configuration&lt;&#x2F;h4&gt;
 &lt;pre style=&quot;background-color:#2b303b;&quot;&gt;
-&lt;span style=&quot;color:#c0c5ce;&quot;&gt;[ req ]
+&lt;code&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;[ req ]
 string_mask = utf8only
 prompt = no
 distinguished_name = req_distinguished_name
-&lt;&#x2F;span&gt;&lt;&#x2F;pre&gt;
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
 &lt;p&gt;The &amp;quot;req&amp;quot; section configures the behavior of the req sub-command and therefore affects how openssl generates certificate requests (both CA certificate requests and leaf certificate requests).&lt;&#x2F;p&gt;
 &lt;ul&gt;
 &lt;li&gt;&lt;code&gt;string_mask = utf8only&lt;&#x2F;code&gt; masks the request to produce only utf8 characters. This is the recommended setting (according to the openssl docs, &amp;quot;this is the PKIX recommendation in RFC2459 after 2003&amp;quot;).&lt;&#x2F;li&gt;
@@ -49,23 +48,23 @@ distinguished_name = req_distinguished_name
 &lt;li&gt;&lt;code&gt;distinguished_name = req_distinguished_name&lt;&#x2F;code&gt; specifies the section containing the DN values. So, let&#x27;s take a look at the &amp;quot;req_distinguished_name&amp;quot; section next.&lt;&#x2F;li&gt;
 &lt;&#x2F;ul&gt;
 &lt;pre style=&quot;background-color:#2b303b;&quot;&gt;
-&lt;span style=&quot;color:#c0c5ce;&quot;&gt;[ req_distinguished_name ]
+&lt;code&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;[ req_distinguished_name ]
 C = US
 ST = Colorado
 L = Denver
 O = 0xC45
 CN = Jason Vigil
 emailAddress = jason@0xc45.com
-&lt;&#x2F;span&gt;&lt;&#x2F;pre&gt;
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
 &lt;p&gt;The &amp;quot;req_distinguished_name&amp;quot; section specifies the DN (distinguished name) values for my certificate requests. Here, I give some information about where I am located (my country, state, and locale), my &amp;quot;organization name&amp;quot;, my common name, and my email. The CA copies this information from certificate requests to signed certificates. Then, anyone can inspect a certificate and identify who it belongs to. Although, for a personal certificate authority, these values may not matter all that much.&lt;&#x2F;p&gt;
 &lt;h4 id=&quot;ca-configuration&quot;&gt;CA Configuration&lt;&#x2F;h4&gt;
 &lt;pre style=&quot;background-color:#2b303b;&quot;&gt;
-&lt;span style=&quot;color:#c0c5ce;&quot;&gt;[ ca ]
+&lt;code&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;[ ca ]
 default_ca = ca_default
-&lt;&#x2F;span&gt;&lt;&#x2F;pre&gt;
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
 &lt;p&gt;The &amp;quot;ca&amp;quot; section configures the openssl &amp;quot;ca&amp;quot; sub-command. This section affects how the certificate authority behaves when signing certificate requests. It contains only one config value. The &lt;code&gt;default_ca&lt;&#x2F;code&gt; option sets the default section to use for the CA configuration. This value may be overridden on the command line, causing openssl to utilize a different section for configuration. However, for my purposes, I only need one type of CA configuration. So, the &lt;code&gt;ca_default&lt;&#x2F;code&gt; section contains most of the configuration for my CA.&lt;&#x2F;p&gt;
 &lt;pre style=&quot;background-color:#2b303b;&quot;&gt;
-&lt;span style=&quot;color:#c0c5ce;&quot;&gt;[ ca_default ]
+&lt;code&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;[ ca_default ]
 dir = .&#x2F;ca
 certificate = $dir&#x2F;ca.cert.pem
 private_key = $dir&#x2F;private&#x2F;key.pem
@@ -82,7 +81,7 @@ copy_extensions = copy
 unique_subject = no
 preserve = no
 policy = policy_match
-&lt;&#x2F;span&gt;&lt;&#x2F;pre&gt;
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
 &lt;p&gt;This is the largest section in my config file (and, this is a super simple CA configuration). With additional features (OCSP, certificate revoke capabilities, etc), it could be much more complicated.&lt;&#x2F;p&gt;
 &lt;ul&gt;
 &lt;li&gt;
@@ -114,23 +113,23 @@ policy = policy_match
 &lt;&#x2F;li&gt;
 &lt;&#x2F;ul&gt;
 &lt;pre style=&quot;background-color:#2b303b;&quot;&gt;
-&lt;span style=&quot;color:#c0c5ce;&quot;&gt;[ policy_match ]
+&lt;code&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;[ policy_match ]
 countryName = match
 stateOrProvinceName = match
 organizationName = match
 commonName = match
 emailAddress = match
-&lt;&#x2F;span&gt;&lt;&#x2F;pre&gt;
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
 &lt;p&gt;When the CA uses this policy, it enforces a highly restrictive set of rules for the DN values of certificate requests: all certificate requests must contain the exact same DN values as the CA certificate. Otherwise, the CA will refuse to sign the request. This is fine for my purposes because I am the only user of my CA. Every certificate request that I want to sign will have a matching DN section anyway.&lt;&#x2F;p&gt;
 &lt;p&gt;There are several values allowed for the fields in this section. Rather than &lt;code&gt;match&lt;&#x2F;code&gt;, one could enforce that a certain value is &lt;code&gt;supplied&lt;&#x2F;code&gt;. Or, it could be set to &lt;code&gt;optional&lt;&#x2F;code&gt;. Also, remember, with the &lt;code&gt;preserve = no&lt;&#x2F;code&gt; setting in the CA configuration section, any field not specified in the policy section is silently omitted in the signed certificate.&lt;&#x2F;p&gt;
 &lt;h4 id=&quot;ca-certificate-configuration&quot;&gt;CA Certificate Configuration&lt;&#x2F;h4&gt;
 &lt;pre style=&quot;background-color:#2b303b;&quot;&gt;
-&lt;span style=&quot;color:#c0c5ce;&quot;&gt;[ ca_extensions ]
+&lt;code&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;[ ca_extensions ]
 basicConstraints = critical,CA:true,pathlen:0
 subjectKeyIdentifier = hash
 authorityKeyIdentifier = keyid:always
 keyUsage = keyCertSign
-&lt;&#x2F;span&gt;&lt;&#x2F;pre&gt;
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
 &lt;p&gt;This section specifies additional configuration (beyond the &amp;quot;ca_default&amp;quot; section) for producing a CA certificate. When creating a CA certificate with the &amp;quot;openssl ca&amp;quot; command, I manually include this section with the &amp;quot;-extensions&amp;quot; flag.&lt;&#x2F;p&gt;
 &lt;ul&gt;
 &lt;li&gt;
@@ -153,12 +152,12 @@ keyUsage = keyCertSign
 &lt;&#x2F;ul&gt;
 &lt;h4 id=&quot;leaf-certificate-configuration&quot;&gt;Leaf Certificate Configuration&lt;&#x2F;h4&gt;
 &lt;pre style=&quot;background-color:#2b303b;&quot;&gt;
-&lt;span style=&quot;color:#c0c5ce;&quot;&gt;[ leaf_extensions ]
+&lt;code&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;[ leaf_extensions ]
 basicConstraints = CA:false
 subjectKeyIdentifier = hash
 authorityKeyIdentifier = keyid:always
 keyUsage = nonRepudiation,digitalSignature,keyEncipherment
-&lt;&#x2F;span&gt;&lt;&#x2F;pre&gt;
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
 &lt;p&gt;This section specifies additional configuration (beyond the &amp;quot;ca_default&amp;quot; section) for producing a leaf certificate. When creating a leaf certificate with the &amp;quot;openssl ca&amp;quot; command, I manually include this section with the &amp;quot;-extensions&amp;quot; flag.&lt;&#x2F;p&gt;
 &lt;ul&gt;
 &lt;li&gt;
@@ -180,10 +179,10 @@ keyUsage = nonRepudiation,digitalSignature,keyEncipherment
 &lt;li&gt;
 &lt;p&gt;Setup initial directory structure:&lt;&#x2F;p&gt;
 &lt;pre style=&quot;background-color:#2b303b;&quot;&gt;
-&lt;span style=&quot;color:#bf616a;&quot;&gt;mkdir -p&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt; ca&#x2F;certs ca&#x2F;private ca&#x2F;reqs
+&lt;code&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;mkdir -p&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt; ca&#x2F;certs ca&#x2F;private ca&#x2F;reqs
 &lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;touch&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt; ca&#x2F;index.txt
 &lt;&#x2F;span&gt;&lt;span style=&quot;color:#96b5b4;&quot;&gt;echo &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;&amp;quot;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a3be8c;&quot;&gt;1000&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;&amp;quot; &amp;gt; ca&#x2F;serial
-&lt;&#x2F;span&gt;&lt;&#x2F;pre&gt;
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
 &lt;p&gt;My openssl config file configures the utility to expect a particular directory structure. It is based on the directory structure used by the example openssl &lt;a href=&quot;https:&#x2F;&#x2F;www.openssl.org&#x2F;docs&#x2F;man1.1.1&#x2F;man1&#x2F;CA.pl.html&quot;&gt;CA.pl&lt;&#x2F;a&gt; script. There are three directories:&lt;&#x2F;p&gt;
 &lt;ul&gt;
 &lt;li&gt;&lt;code&gt;ca&#x2F;certs&lt;&#x2F;code&gt;: for signed certificates&lt;&#x2F;li&gt;
@@ -199,25 +198,25 @@ keyUsage = nonRepudiation,digitalSignature,keyEncipherment
 &lt;li&gt;
 &lt;p&gt;Generate private key:&lt;&#x2F;p&gt;
 &lt;pre style=&quot;background-color:#2b303b;&quot;&gt;
-&lt;span style=&quot;color:#bf616a;&quot;&gt;openssl&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt; genrsa&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt; -out&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt; ca&#x2F;private&#x2F;key.pem 8192
-&lt;&#x2F;span&gt;&lt;&#x2F;pre&gt;
+&lt;code&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;openssl&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt; genrsa&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt; -out&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt; ca&#x2F;private&#x2F;key.pem 8192
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
 &lt;p&gt;This will generate an RSA key that is 8192 bits long.&lt;&#x2F;p&gt;
 &lt;&#x2F;li&gt;
 &lt;li&gt;
 &lt;p&gt;Create certificate request:&lt;&#x2F;p&gt;
 &lt;pre style=&quot;background-color:#2b303b;&quot;&gt;
-&lt;span style=&quot;color:#bf616a;&quot;&gt;openssl&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt; req \
+&lt;code&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;openssl&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt; req \
 &lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;    -new &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;\
 &lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;    -config&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt; openssl.cnf \
 &lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;    -key&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt; ca&#x2F;private&#x2F;key.pem \
 &lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;    -out&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt; ca&#x2F;ca.req.pem
-&lt;&#x2F;span&gt;&lt;&#x2F;pre&gt;
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
 &lt;p&gt;This creates a new certificate request using the config file &amp;quot;openssl.cnf&amp;quot; (created before) and the CA private key from the previous step. The resulting certificate request is written to &amp;quot;ca&#x2F;ca.req.pem&amp;quot;.&lt;&#x2F;p&gt;
 &lt;&#x2F;li&gt;
 &lt;li&gt;
 &lt;p&gt;Self-sign certificate request:&lt;&#x2F;p&gt;
 &lt;pre style=&quot;background-color:#2b303b;&quot;&gt;
-&lt;span style=&quot;color:#bf616a;&quot;&gt;openssl&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt; ca \
+&lt;code&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;openssl&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt; ca \
 &lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;    -selfsign &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;\
 &lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;    -config&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt; openssl.cnf \
 &lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;    -extensions&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt; ca_extensions \
@@ -225,7 +224,7 @@ keyUsage = nonRepudiation,digitalSignature,keyEncipherment
 &lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;    -keyfile&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt; ca&#x2F;private&#x2F;key.pem \
 &lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;    -in&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt; ca&#x2F;ca.req.pem \
 &lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;    -out&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt; ca&#x2F;ca.cert.pem
-&lt;&#x2F;span&gt;&lt;&#x2F;pre&gt;
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
 &lt;p&gt;This command &amp;quot;self-signs&amp;quot; the certificate request. It adds the extensions in the &amp;quot;ca_extensions&amp;quot; section of the config file to the certificate. It overrides the config value &amp;quot;default_days&amp;quot; and makes the certificate valid for 365 days. The certificate is signed with the CA&#x27;s own private key. This is why it&#x27;s called a &amp;quot;self-signed&amp;quot; certificate. The resulting root certificate is written to &amp;quot;ca&#x2F;ca.cert.pem&amp;quot;.&lt;&#x2F;p&gt;
 &lt;&#x2F;li&gt;
 &lt;&#x2F;ol&gt;
@@ -235,39 +234,39 @@ keyUsage = nonRepudiation,digitalSignature,keyEncipherment
 &lt;li&gt;
 &lt;p&gt;Generate private key:&lt;&#x2F;p&gt;
 &lt;pre style=&quot;background-color:#2b303b;&quot;&gt;
-&lt;span style=&quot;color:#bf616a;&quot;&gt;openssl&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt; genrsa&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt; -out&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt; ca&#x2F;reqs&#x2F;test.key.pem 8192
-&lt;&#x2F;span&gt;&lt;&#x2F;pre&gt;
+&lt;code&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;openssl&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt; genrsa&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt; -out&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt; ca&#x2F;reqs&#x2F;test.key.pem 8192
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
 &lt;p&gt;This will generate an RSA key that is 8192 bits long.&lt;&#x2F;p&gt;
 &lt;&#x2F;li&gt;
 &lt;li&gt;
 &lt;p&gt;Create certificate request:&lt;&#x2F;p&gt;
 &lt;pre style=&quot;background-color:#2b303b;&quot;&gt;
-&lt;span style=&quot;color:#bf616a;&quot;&gt;openssl&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt; req \
+&lt;code&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;openssl&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt; req \
 &lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;    -new &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;\
 &lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;    -config&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt; openssl.cnf \
 &lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;    -addext &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;&amp;quot;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a3be8c;&quot;&gt;subjectAltName=DNS:test.mydomain.com&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;&amp;quot; \
 &lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;    -key&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt; ca&#x2F;reqs&#x2F;test.key.pem \
 &lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;    -out&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt; ca&#x2F;reqs&#x2F;test.req.pem
-&lt;&#x2F;span&gt;&lt;&#x2F;pre&gt;
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
 &lt;p&gt;This creates a new certificate request using the config file &amp;quot;openssl.cnf&amp;quot; (created before) and the private key from the previous step. It adds the &amp;quot;subjectAltName&amp;quot; extension to specify the DNS name for the service that will use the leaf certificate. The resulting certificate request is written to &amp;quot;ca&#x2F;reqs&#x2F;test.req.pem&amp;quot;.&lt;&#x2F;p&gt;
 &lt;&#x2F;li&gt;
 &lt;li&gt;
 &lt;p&gt;Sign certificate request:&lt;&#x2F;p&gt;
 &lt;pre style=&quot;background-color:#2b303b;&quot;&gt;
-&lt;span style=&quot;color:#bf616a;&quot;&gt;openssl&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt; ca \
+&lt;code&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;openssl&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt; ca \
 &lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;    -config&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt; openssl.cnf \
 &lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;    -extensions&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt; leaf_extensions \
 &lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;    -keyfile&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt; ca&#x2F;private&#x2F;key.pem \
 &lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;    -in&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt; ca&#x2F;reqs&#x2F;test.req.pem \
 &lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;    -out&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt; ca&#x2F;reqs&#x2F;test.cert.pem
-&lt;&#x2F;span&gt;&lt;&#x2F;pre&gt;
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
 &lt;p&gt;This command signs the certificate request. It adds the extensions in the &amp;quot;leaf_extensions&amp;quot; section of the config file to the certificate. The certificate is signed with the CA private key. The resulting root certificate is written to &amp;quot;ca&#x2F;reqs&#x2F;test.cert.pem&amp;quot;.&lt;&#x2F;p&gt;
 &lt;&#x2F;li&gt;
 &lt;li&gt;
 &lt;p&gt;Combine root and leaf certificates:&lt;&#x2F;p&gt;
 &lt;pre style=&quot;background-color:#2b303b;&quot;&gt;
-&lt;span style=&quot;color:#bf616a;&quot;&gt;cat&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt; ca&#x2F;reqs&#x2F;test.cert.pem ca&#x2F;ca.cert.pem &amp;gt; test.cert.pem
-&lt;&#x2F;span&gt;&lt;&#x2F;pre&gt;
+&lt;code&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;cat&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt; ca&#x2F;reqs&#x2F;test.cert.pem ca&#x2F;ca.cert.pem &amp;gt; test.cert.pem
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
 &lt;p&gt;Here, we combine the leaf certificate and the root certificate to produce a certificate &amp;quot;chain&amp;quot; (of length two). Any application that receives this chain can verify that the leaf certificate was signed by the private key associated with the root certificate.&lt;&#x2F;p&gt;
 &lt;&#x2F;li&gt;
 &lt;&#x2F;ol&gt;
@@ -295,15 +294,15 @@ keyUsage = nonRepudiation,digitalSignature,keyEncipherment
 &lt;li&gt;&lt;a href=&quot;https:&#x2F;&#x2F;www.openssl.org&#x2F;docs&#x2F;man1.1.1&#x2F;man5&#x2F;x509v3_config.html&quot;&gt;https:&#x2F;&#x2F;www.openssl.org&#x2F;docs&#x2F;man1.1.1&#x2F;man5&#x2F;x509v3_config.html&lt;&#x2F;a&gt;&lt;&#x2F;li&gt;
 &lt;li&gt;&lt;a href=&quot;https:&#x2F;&#x2F;www.openssl.org&#x2F;docs&#x2F;man1.1.1&#x2F;man1&#x2F;CA.pl.html&quot;&gt;https:&#x2F;&#x2F;www.openssl.org&#x2F;docs&#x2F;man1.1.1&#x2F;man1&#x2F;CA.pl.html&lt;&#x2F;a&gt;&lt;&#x2F;li&gt;
 &lt;&#x2F;ul&gt;
-</description>
-            </item>
-        
-            <item>
-                <title>OpenBSD Home Router</title>
-                <pubDate>Sat, 25 Apr 2020 00:00:00 +0000</pubDate>
-                <link>https://0xC45.com/blog/openbsd-home-router/</link>
-                <guid>https://0xC45.com/blog/openbsd-home-router/</guid>
-                <description>&lt;h2 id=&quot;overview&quot;&gt;Overview&lt;&#x2F;h2&gt;
+</content>
+	</entry>
+	<entry xml:lang="en">
+		<title>OpenBSD Home Router</title>
+		<published>2020-04-25T00:00:00+00:00</published>
+		<updated>2020-04-25T00:00:00+00:00</updated>
+		<link href="https://0xC45.com/blog/openbsd-home-router/" type="text/html"/>
+		<id>https://0xC45.com/blog/openbsd-home-router/</id>
+		<content type="html">&lt;h2 id=&quot;overview&quot;&gt;Overview&lt;&#x2F;h2&gt;
 &lt;p&gt;Recently, I made a home router from scratch using &lt;a href=&quot;https:&#x2F;&#x2F;www.openbsd.org&#x2F;66.html&quot;&gt;OpenBSD 6.6&lt;&#x2F;a&gt;, without installing any additional packages, using only what comes with the basic OS installation. Originally, before deciding to &amp;quot;do it from scratch&amp;quot;, I had a goal to make a router using open source software in order to improve my network security. After looking at some popular open source firewall and routing projects (mainly &lt;a href=&quot;https:&#x2F;&#x2F;www.pfsense.org&#x2F;&quot;&gt;pfSense&lt;&#x2F;a&gt; and &lt;a href=&quot;https:&#x2F;&#x2F;opnsense.org&#x2F;&quot;&gt;OPNSense&lt;&#x2F;a&gt;), I finally decided to build my own. pfSense and OPNSense both seem like decent software (and I have successfully used both in the past), but this time, I wanted to &amp;quot;do it the hard way&amp;quot; and learn about the services that make up a typical router. Here are some of the cool features that my custom device currently has:&lt;&#x2F;p&gt;
 &lt;ol&gt;
 &lt;li&gt;It&#x27;s almost fully open source, down to the BIOS and firmware. Unfortunately, the hardware isn&#x27;t open source.&lt;&#x2F;li&gt;
@@ -317,8 +316,8 @@ keyUsage = nonRepudiation,digitalSignature,keyEncipherment
 &lt;p&gt;First, I needed an actual machine for my home network appliance. After considering the various options (purchase a device, build something myself, use a virtual machine, etc.) I decided to use an &lt;a href=&quot;https:&#x2F;&#x2F;pcengines.ch&#x2F;apu2.htm&quot;&gt;apu2&lt;&#x2F;a&gt;. It is a low-power, relatively inexpensive yet performant solution, which makes it ideal for this kind of application. In addition, it uses an open source BIOS (&lt;a href=&quot;https:&#x2F;&#x2F;github.com&#x2F;pcengines&#x2F;seabios&quot;&gt;SeaBIOS&lt;&#x2F;a&gt;) and firmware (&lt;a href=&quot;https:&#x2F;&#x2F;github.com&#x2F;pcengines&#x2F;coreboot&quot;&gt;coreboot&lt;&#x2F;a&gt;). I went with a model that has a quad-core processor, 4GB memory, and 3 separate gigabit NICs. In addition, I purchased a 16GB M-SATA SSD (for the main OS installation), a 4GB SD (for a utility OS installation), a case, and a serial cable (the apu2 does not have a port for graphics output). The total cost was roughly $160.&lt;&#x2F;p&gt;
 &lt;p&gt;After the device arrived, the first challenge was connecting to it. Ok, it wasn&#x27;t actually that challenging. I connected to the apu2 with my OpenBSD netbook and the serial cable:&lt;&#x2F;p&gt;
 &lt;pre style=&quot;background-color:#2b303b;&quot;&gt;
-&lt;span style=&quot;color:#c0c5ce;&quot;&gt;cu -l &#x2F;dev&#x2F;cuaU0 -s 115200
-&lt;&#x2F;span&gt;&lt;&#x2F;pre&gt;
+&lt;code&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;cu -l &#x2F;dev&#x2F;cuaU0 -s 115200
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
 &lt;p&gt;No matter which software you use to connect to the apu2 over serial, the important setting is the default baud rate, 115200.&lt;&#x2F;p&gt;
 &lt;h2 id=&quot;firmware-coreboot&quot;&gt;Firmware (coreboot)&lt;&#x2F;h2&gt;
 &lt;p&gt;After booting up the apu2, I noticed that the BIOS was a bit out of date. It was probably flashed with the current BIOS version at the time of manufacturing, which was likely a while before it ended up in my hands. So, I needed to upgrade the BIOS. The &lt;a href=&quot;https:&#x2F;&#x2F;pcengines.ch&#x2F;howto.htm#bios&quot;&gt;official instructions&lt;&#x2F;a&gt; describe a method to update the BIOS using a PC Engines custom TinyCore Linux distribution. However, since I was already planning to make two different boot disks, one for the router OS and one for a &amp;quot;utility&amp;quot; OS, I decided to setup the utility OS and make it capable of flashing the BIOS.&lt;&#x2F;p&gt;
@@ -344,19 +343,19 @@ keyUsage = nonRepudiation,digitalSignature,keyEncipherment
 &lt;&#x2F;ul&gt;
 &lt;p&gt;In order to boot the new Debian installation for the first time, I had to manually edit the boot entry. Like before, add &lt;code&gt;console=ttyS0,115200n8&lt;&#x2F;code&gt; to boot into a serial tty. Then, after booting and logging in as root, I configured grub so that it would no longer be necessary to manually edit the boot entry. To do that, edit &#x2F;etc&#x2F;default&#x2F;grub and change the following settings:&lt;&#x2F;p&gt;
 &lt;pre style=&quot;background-color:#2b303b;&quot;&gt;
-&lt;span style=&quot;color:#c0c5ce;&quot;&gt;GRUB_CMDLINE_LINUX=&amp;#39;console=ttyS0,19200n8&amp;#39;
+&lt;code&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;GRUB_CMDLINE_LINUX=&amp;#39;console=ttyS0,19200n8&amp;#39;
 GRUB_TERMINAL=serial
-&lt;&#x2F;span&gt;&lt;&#x2F;pre&gt;
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
 &lt;p&gt;Finally, run &lt;code&gt;update-grub&lt;&#x2F;code&gt; to regenerate the grub boot menu. At this point, the Debian &amp;quot;utility&amp;quot; OS install is complete and it is time to update the BIOS.&lt;&#x2F;p&gt;
 &lt;h3 id=&quot;firmware-update&quot;&gt;Firmware Update&lt;&#x2F;h3&gt;
 &lt;p&gt;Updating the BIOS is fairly simple. First, install the flashrom utility. It&#x27;s available in the Debian package repositories.&lt;&#x2F;p&gt;
 &lt;pre style=&quot;background-color:#2b303b;&quot;&gt;
-&lt;span style=&quot;color:#c0c5ce;&quot;&gt;apt install flashrom
-&lt;&#x2F;span&gt;&lt;&#x2F;pre&gt;
+&lt;code&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;apt install flashrom
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
 &lt;p&gt;Then, download the latest mainline version of the firmware from &lt;a href=&quot;https:&#x2F;&#x2F;pcengines.github.io&#x2F;&quot;&gt;https:&#x2F;&#x2F;pcengines.github.io&#x2F;&lt;&#x2F;a&gt;, write the file to a USB, and mount the USB on the apu2. To flash the firmware (assuming the file is named coreboot.rom), run:&lt;&#x2F;p&gt;
 &lt;pre style=&quot;background-color:#2b303b;&quot;&gt;
-&lt;span style=&quot;color:#c0c5ce;&quot;&gt;flashrom -w coreboot.rom -p internal
-&lt;&#x2F;span&gt;&lt;&#x2F;pre&gt;
+&lt;code&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;flashrom -w coreboot.rom -p internal
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
 &lt;p&gt;Then, reboot. For more information on flashing the apu2 firmware, check out the &lt;a href=&quot;https:&#x2F;&#x2F;github.com&#x2F;pcengines&#x2F;apu2-documentation&#x2F;blob&#x2F;master&#x2F;docs&#x2F;firmware_flashing.md&quot;&gt;docs&lt;&#x2F;a&gt;.&lt;&#x2F;p&gt;
 &lt;h2 id=&quot;os-openbsd&quot;&gt;OS (OpenBSD)&lt;&#x2F;h2&gt;
 &lt;p&gt;Ok, now it is time to start talking about the actual router OS. For this, I chose OpenBSD. OpenBSD is a popular flavor of BSD that&#x27;s known for security. Given BSD&#x27;s general reputation as a networking appliance operating system, OpenBSD seemed like a good fit for the job.&lt;&#x2F;p&gt;
@@ -369,9 +368,9 @@ GRUB_TERMINAL=serial
 &lt;p&gt;Boot the apu2 from the OpenBSD installer USB drive.&lt;&#x2F;p&gt;
 &lt;p&gt;At the &lt;code&gt;boot&amp;gt;&lt;&#x2F;code&gt; prompt, configure and enable a serial tty by entering the following commands.&lt;&#x2F;p&gt;
 &lt;pre style=&quot;background-color:#2b303b;&quot;&gt;
-&lt;span style=&quot;color:#c0c5ce;&quot;&gt;stty com0 115200
+&lt;code&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;stty com0 115200
 &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;set tty com0
-&lt;&#x2F;span&gt;&lt;&#x2F;pre&gt;
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
 &lt;p&gt;Now, press enter at the &lt;code&gt;boot&amp;gt;&lt;&#x2F;code&gt; prompt to boot the installer.&lt;&#x2F;p&gt;
 &lt;&#x2F;li&gt;
 &lt;li&gt;
@@ -381,56 +380,56 @@ GRUB_TERMINAL=serial
 &lt;p&gt;Erase the target installation disk.&lt;&#x2F;p&gt;
 &lt;p&gt;To determine the identifier for the target installation disk, check &lt;code&gt;dmesg&lt;&#x2F;code&gt; (In was sd0 in my case).&lt;&#x2F;p&gt;
 &lt;pre style=&quot;background-color:#2b303b;&quot;&gt;
-&lt;span style=&quot;color:#c0c5ce;&quot;&gt;cd &#x2F;dev &amp;amp;&amp;amp; sh MAKEDEV sd0
+&lt;code&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;cd &#x2F;dev &amp;amp;&amp;amp; sh MAKEDEV sd0
 &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;dd if=&#x2F;dev&#x2F;urandom of=&#x2F;dev&#x2F;rsd0c bs=1m
-&lt;&#x2F;span&gt;&lt;&#x2F;pre&gt;&lt;&#x2F;li&gt;
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;&lt;&#x2F;li&gt;
 &lt;li&gt;
 &lt;p&gt;Setup the disk MBR.&lt;&#x2F;p&gt;
 &lt;pre style=&quot;background-color:#2b303b;&quot;&gt;
-&lt;span style=&quot;color:#c0c5ce;&quot;&gt;fdisk -iy sd0
-&lt;&#x2F;span&gt;&lt;&#x2F;pre&gt;&lt;&#x2F;li&gt;
+&lt;code&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;fdisk -iy sd0
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;&lt;&#x2F;li&gt;
 &lt;li&gt;
 &lt;p&gt;Create a RAID partition to use as an encrypted pseudo-device.&lt;&#x2F;p&gt;
 &lt;p&gt;Run the disk label editor.&lt;&#x2F;p&gt;
 &lt;pre style=&quot;background-color:#2b303b;&quot;&gt;
-&lt;span style=&quot;color:#c0c5ce;&quot;&gt;disklabel -E sd0
-&lt;&#x2F;span&gt;&lt;&#x2F;pre&gt;
+&lt;code&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;disklabel -E sd0
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
 &lt;p&gt;In the disk label editor, enter the following commands to create a RAID partition over the entire disk.&lt;&#x2F;p&gt;
 &lt;pre style=&quot;background-color:#2b303b;&quot;&gt;
-&lt;span style=&quot;color:#c0c5ce;&quot;&gt;a a
+&lt;code&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;a a
 &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;&amp;lt;enter&amp;gt;
 &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;&amp;lt;enter&amp;gt;
 &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;RAID
 &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;p
 &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;w
 &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;q
-&lt;&#x2F;span&gt;&lt;&#x2F;pre&gt;&lt;&#x2F;li&gt;
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;&lt;&#x2F;li&gt;
 &lt;li&gt;
 &lt;p&gt;Create the encrypted pseudo-device and set the encryption password.&lt;&#x2F;p&gt;
 &lt;pre style=&quot;background-color:#2b303b;&quot;&gt;
-&lt;span style=&quot;color:#c0c5ce;&quot;&gt;bioctl -c C -l sd0a softraid0
+&lt;code&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;bioctl -c C -l sd0a softraid0
 &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;# use the device identifier created in the previous command (sd3 for me)
 &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;cd &#x2F;dev &amp;amp;&amp;amp; sh MAKEDEV sd3
-&lt;&#x2F;span&gt;&lt;&#x2F;pre&gt;&lt;&#x2F;li&gt;
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;&lt;&#x2F;li&gt;
 &lt;li&gt;
 &lt;p&gt;Clear the first megabyte of the new pseudo-device.&lt;&#x2F;p&gt;
 &lt;p&gt;If you&#x27;re unlucky, the random data written to the device may look like a real disk header. Clearing out the first megabyte fixes this potential issue.&lt;&#x2F;p&gt;
 &lt;pre style=&quot;background-color:#2b303b;&quot;&gt;
-&lt;span style=&quot;color:#c0c5ce;&quot;&gt;dd if=&#x2F;dev&#x2F;zero of=&#x2F;dev&#x2F;rsd3c bs=1m count=1
-&lt;&#x2F;span&gt;&lt;&#x2F;pre&gt;&lt;&#x2F;li&gt;
+&lt;code&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;dd if=&#x2F;dev&#x2F;zero of=&#x2F;dev&#x2F;rsd3c bs=1m count=1
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;&lt;&#x2F;li&gt;
 &lt;li&gt;
 &lt;p&gt;Return to the main installer menu.&lt;&#x2F;p&gt;
 &lt;pre style=&quot;background-color:#2b303b;&quot;&gt;
-&lt;span style=&quot;color:#c0c5ce;&quot;&gt;exit
-&lt;&#x2F;span&gt;&lt;&#x2F;pre&gt;&lt;&#x2F;li&gt;
+&lt;code&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;exit
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;&lt;&#x2F;li&gt;
 &lt;li&gt;
 &lt;p&gt;Type &lt;code&gt;i&lt;&#x2F;code&gt; to run the installer.&lt;&#x2F;p&gt;
 &lt;pre style=&quot;background-color:#2b303b;&quot;&gt;
-&lt;span style=&quot;color:#c0c5ce;&quot;&gt;Terminal type? &amp;lt;enter&amp;gt; (the default seemed to work fine for me)
-&lt;&#x2F;span&gt;&lt;&#x2F;pre&gt;
+&lt;code&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;Terminal type? &amp;lt;enter&amp;gt; (the default seemed to work fine for me)
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
 &lt;p&gt;Next, set the system hostname and configure the network interfaces.&lt;&#x2F;p&gt;
 &lt;pre style=&quot;background-color:#2b303b;&quot;&gt;
-&lt;span style=&quot;color:#c0c5ce;&quot;&gt;System hostname? firewall (in my case)
+&lt;code&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;System hostname? firewall (in my case)
 &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;Which nic to configure? em0 (this will be the WAN interface)
 &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;IPv4 address? 192.168.0.2 (in my case)
 &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;Netmask? 255.255.255.0 (in my case)
@@ -446,16 +445,16 @@ GRUB_TERMINAL=serial
 &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;Netmask? 255.255.255.0 (in my case)
 &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;IPv6 address? none (in my case)
 &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;Which nic to configure? done
-&lt;&#x2F;span&gt;&lt;&#x2F;pre&gt;
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
 &lt;p&gt;Next, set the default route and configure DNS.&lt;&#x2F;p&gt;
 &lt;pre style=&quot;background-color:#2b303b;&quot;&gt;
-&lt;span style=&quot;color:#c0c5ce;&quot;&gt;Default route? 192.168.0.1 (in my case)
+&lt;code&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;Default route? 192.168.0.1 (in my case)
 &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;DNS domain name? localdomain (in my case)
 &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;DNS nameservers? 8.8.8.8 8.8.4.4 (for now)
-&lt;&#x2F;span&gt;&lt;&#x2F;pre&gt;
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
 &lt;p&gt;Next, there are some miscellaneous tasks: set the root password, enable ssh, setup serial console, create a user, and set your timezone.&lt;&#x2F;p&gt;
 &lt;pre style=&quot;background-color:#2b303b;&quot;&gt;
-&lt;span style=&quot;color:#c0c5ce;&quot;&gt;Password for root account? (something secure)
+&lt;code&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;Password for root account? (something secure)
 &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;Start sshd by default? yes (not necessary, but useful)
 &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;Change default console to com0? yes
 &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;Which speed should com0 use? 115200
@@ -464,16 +463,16 @@ GRUB_TERMINAL=serial
 &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;Password? (something secure)
 &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;Allow root ssh login? no
 &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;What timezone? (set your timezone)
-&lt;&#x2F;span&gt;&lt;&#x2F;pre&gt;
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
 &lt;p&gt;Next, partition your target installation disk (the encrypted pseudo-device).&lt;&#x2F;p&gt;
 &lt;pre style=&quot;background-color:#2b303b;&quot;&gt;
-&lt;span style=&quot;color:#c0c5ce;&quot;&gt;Which disk is the root disk? sd3 (pseudo-device from previous steps)
+&lt;code&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;Which disk is the root disk? sd3 (pseudo-device from previous steps)
 &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;Whole disk MBR? whole
 &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;Disk partitioning? c (setup custom layout)
-&lt;&#x2F;span&gt;&lt;&#x2F;pre&gt;
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
 &lt;p&gt;Here are the commands I used to partition my disk.&lt;&#x2F;p&gt;
 &lt;pre style=&quot;background-color:#2b303b;&quot;&gt;
-&lt;span style=&quot;color:#c0c5ce;&quot;&gt;a a
+&lt;code&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;a a
 &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;&amp;lt;enter&amp;gt;
 &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;6G
 &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;&amp;lt;enter&amp;gt;
@@ -500,42 +499,42 @@ GRUB_TERMINAL=serial
 &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;p
 &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;w
 &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;q
-&lt;&#x2F;span&gt;&lt;&#x2F;pre&gt;
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
 &lt;p&gt;My disk ended up being partitioned as follows:&lt;&#x2F;p&gt;
 &lt;pre style=&quot;background-color:#2b303b;&quot;&gt;
-&lt;span style=&quot;color:#c0c5ce;&quot;&gt;#   size       offset     fstype   [fsize   bsize   cpg]
+&lt;code&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;#   size       offset     fstype   [fsize   bsize   cpg]
 &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;a:  12594880   64         4.2BSD    2048    16384   1      # &#x2F;
 &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;b:  8402011    12594944   swap
 &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;c:  31261898   0          unused
 &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;d:  224896     20996960   4.2BSD    2048    16384   1      # &#x2F;usr&#x2F;local
 &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;e:  8401984    21221856   4.2BSD    2048    16384   1      # &#x2F;var
 &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;f:  1622560    29623840   4.2BSD    2048    16384   1      # &#x2F;tmp
-&lt;&#x2F;span&gt;&lt;&#x2F;pre&gt;
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
 &lt;p&gt;Finish partitioning disks.&lt;&#x2F;p&gt;
 &lt;pre style=&quot;background-color:#2b303b;&quot;&gt;
-&lt;span style=&quot;color:#c0c5ce;&quot;&gt;Which disk to initialize? done
-&lt;&#x2F;span&gt;&lt;&#x2F;pre&gt;
+&lt;code&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;Which disk to initialize? done
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
 &lt;p&gt;Before installing the sets, type &lt;code&gt;!&lt;&#x2F;code&gt; to exit to a shell and determine the device identifier of the OpenBSD 6.6 installer USB drive. Then, return to the installer.&lt;&#x2F;p&gt;
 &lt;pre style=&quot;background-color:#2b303b;&quot;&gt;
-&lt;span style=&quot;color:#c0c5ce;&quot;&gt;!
+&lt;code&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;!
 &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;dmesg  # for me, the device identifier ended up being sd2
 &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;exit
-&lt;&#x2F;span&gt;&lt;&#x2F;pre&gt;
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
 &lt;p&gt;Next, mount the OpenBSD 6.6 installer USB drive and load the sets.&lt;&#x2F;p&gt;
 &lt;pre style=&quot;background-color:#2b303b;&quot;&gt;
-&lt;span style=&quot;color:#c0c5ce;&quot;&gt;Location of sets? disk
+&lt;code&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;Location of sets? disk
 &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;Already mounted? no
 &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;Which disk contains the install media? sd2 (as just determined)
 &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;Which partition has the install sets? &amp;lt;enter&amp;gt;
 &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;Pathname to the sets? &amp;lt;enter&amp;gt;
-&lt;&#x2F;span&gt;&lt;&#x2F;pre&gt;
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
 &lt;p&gt;Next, select which sets to install and install them.&lt;&#x2F;p&gt;
 &lt;pre style=&quot;background-color:#2b303b;&quot;&gt;
-&lt;span style=&quot;color:#c0c5ce;&quot;&gt;Set name(s)? -game* -x* (no need for games or a gui)
+&lt;code&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;Set name(s)? -game* -x* (no need for games or a gui)
 &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;Set name(s)? done
 &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;Continue without verification? yes
 &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;Location of sets? done
-&lt;&#x2F;span&gt;&lt;&#x2F;pre&gt;&lt;&#x2F;li&gt;
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;&lt;&#x2F;li&gt;
 &lt;&#x2F;ol&gt;
 &lt;p&gt;Success! Reboot the device. Don&#x27;t forget to run &lt;code&gt;syspatch&lt;&#x2F;code&gt; after rebooting in order to apply the latest patches.&lt;&#x2F;p&gt;
 &lt;h2 id=&quot;firewall-pf&quot;&gt;Firewall (pf)&lt;&#x2F;h2&gt;
@@ -549,7 +548,7 @@ GRUB_TERMINAL=serial
 &lt;&#x2F;ol&gt;
 &lt;p&gt;Here is my &#x2F;etc&#x2F;pf.conf that achieves this desired configuration.&lt;&#x2F;p&gt;
 &lt;pre style=&quot;background-color:#2b303b;&quot;&gt;
-&lt;span style=&quot;color:#c0c5ce;&quot;&gt;# interfaces
+&lt;code&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;# interfaces
 lo_if = &amp;quot;lo0&amp;quot;
 wan_if = &amp;quot;em0&amp;quot;
 prod_if = &amp;quot;em1&amp;quot;
@@ -598,11 +597,11 @@ block in on $dev_if from $dev_range to $prod_range
 # block outgoing unencrypted dns requests
 block proto { TCP UDP } from { $prod_range $dev_range } to any port 53
 pass proto { TCP UDP } from { $prod_range $dev_range} to self port 53
-&lt;&#x2F;span&gt;&lt;&#x2F;pre&gt;
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
 &lt;p&gt;Next, in order to perform NAT (to make this device an actual router), run the following:&lt;&#x2F;p&gt;
 &lt;pre style=&quot;background-color:#2b303b;&quot;&gt;
-&lt;span style=&quot;color:#c0c5ce;&quot;&gt;echo &amp;#39;net.inet.ip.forwarding=1&amp;#39; &amp;gt;&amp;gt; &#x2F;etc&#x2F;sysctl.conf
-&lt;&#x2F;span&gt;&lt;&#x2F;pre&gt;
+&lt;code&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;echo &amp;#39;net.inet.ip.forwarding=1&amp;#39; &amp;gt;&amp;gt; &#x2F;etc&#x2F;sysctl.conf
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
 &lt;p&gt;Finally, reboot with &lt;code&gt;reboot -p&lt;&#x2F;code&gt;. Now, the router is functional and secured with the pf firewall. At this point, it will work as a minimum viable product. However, every device on the network will need to manually configure its own static IP address, subnet mask, gateway, and DNS server (because there is no DHCP service running to supply these configuration details).&lt;&#x2F;p&gt;
 &lt;h2 id=&quot;dhcp-dhcpd&quot;&gt;DHCP (dhcpd)&lt;&#x2F;h2&gt;
 &lt;p&gt;DHCP is a service that (among other things) gives IP addresses to the devices on your network. So when a device joins the network, it will be given an IP address by the DHCP server running on the router. The DHCP server bundled with OpenBSD 6.6 is dhcpd.&lt;&#x2F;p&gt;
@@ -610,7 +609,7 @@ pass proto { TCP UDP } from { $prod_range $dev_range} to self port 53
 &lt;p&gt;In addition to defining the IP address allocations in my network, I configured dhcpd to inform devices on my network of the preferred DNS server for the network, the router itself. We haven&#x27;t set this up yet, but the router will also function as a caching DNS server.&lt;&#x2F;p&gt;
 &lt;p&gt;Here is an example &#x2F;etc&#x2F;dhcpd.conf file:&lt;&#x2F;p&gt;
 &lt;pre style=&quot;background-color:#2b303b;&quot;&gt;
-&lt;span style=&quot;color:#c0c5ce;&quot;&gt;# prod network
+&lt;code&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;# prod network
 subnet 192.168.1.0 netmask 255.255.255.0 {
         option routers 192.168.1.1;
         option domain-name-servers 192.168.1.1;
@@ -630,13 +629,13 @@ subnet 192.168.2.0 netmask 255.255.255.0 {
                 hardware ethernet 11:11:11:11:11:11;
         }
 }
-&lt;&#x2F;span&gt;&lt;&#x2F;pre&gt;
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
 &lt;p&gt;This &#x2F;etc&#x2F;dhcpd.conf file configures the dhcpd server to hand out IP addresses for the dev and prod networks from within the specified ranges. In addition, it informs devices of the local DNS server (not yet configured). It also configures two &amp;quot;special devices&amp;quot; that will always be given the same IP addresses. dhcpd identifies these two devices by their MAC addresses. For more information check out the &lt;a href=&quot;https:&#x2F;&#x2F;man.openbsd.org&#x2F;dhcpd.conf.5&quot;&gt;dhcpd.conf man page&lt;&#x2F;a&gt;.&lt;&#x2F;p&gt;
 &lt;p&gt;To enable dhcpd on the em1 and em2 interfaces, run:&lt;&#x2F;p&gt;
 &lt;pre style=&quot;background-color:#2b303b;&quot;&gt;
-&lt;span style=&quot;color:#c0c5ce;&quot;&gt;rcctl enable dhcpd
+&lt;code&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;rcctl enable dhcpd
 rcctl set dhcpd flags em1 em2
-&lt;&#x2F;span&gt;&lt;&#x2F;pre&gt;
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
 &lt;p&gt;Now, the DHCP server is running, automatically handing out IP addresses and network configuration details to new devices that join the network.&lt;&#x2F;p&gt;
 &lt;h2 id=&quot;dns-unbound&quot;&gt;DNS (unbound)&lt;&#x2F;h2&gt;
 &lt;p&gt;The last piece (for now) of this home router is DNS. Setting up a caching DNS server on the home router offers several benefits.&lt;&#x2F;p&gt;
@@ -647,7 +646,7 @@ rcctl set dhcpd flags em1 em2
 &lt;&#x2F;ol&gt;
 &lt;p&gt;Here is an example unbound config file (located at &#x2F;var&#x2F;unbound&#x2F;etc&#x2F;unbound.conf):&lt;&#x2F;p&gt;
 &lt;pre style=&quot;background-color:#2b303b;&quot;&gt;
-&lt;span style=&quot;color:#c0c5ce;&quot;&gt;server:
+&lt;code&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;server:
         interface: 127.0.0.1
         interface: 192.168.1.1
         interface: 192.168.2.1
@@ -666,17 +665,15 @@ forward-zone:
         forward-tls-upstream: yes
         forward-addr: 8.8.8.8@853
         forward-addr: 8.8.4.4@853
-&lt;&#x2F;span&gt;&lt;&#x2F;pre&gt;
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
 &lt;p&gt;To enable the unbound DNS caching server, run:&lt;&#x2F;p&gt;
 &lt;pre style=&quot;background-color:#2b303b;&quot;&gt;
-&lt;span style=&quot;color:#c0c5ce;&quot;&gt;rcctl enable unbound
-&lt;&#x2F;span&gt;&lt;&#x2F;pre&gt;
+&lt;code&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;rcctl enable unbound
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
 &lt;p&gt;Now, the DNS caching server is running. Devices that join the network will automatically use this DNS server (unless otherwise configured) because the DHCP server will inform new devices that this is the preferred DNS server for the network. Also, by using this DNS server, the custom local DNS entries will resolve properly. For example, when any device on the local network makes a DNS lookup for &lt;code&gt;special-device-1.localdoman&lt;&#x2F;code&gt;, it resolves to 192.168.1.2. Lastly, all DNS lookups are cached by the unbound service. This will improve the latency of repeat DNS lookups.&lt;&#x2F;p&gt;
 &lt;h2 id=&quot;conclusion&quot;&gt;Conclusion&lt;&#x2F;h2&gt;
 &lt;p&gt;So, that&#x27;s pretty much it. At this point, the device functions as a router, firewall, DHCP server, and caching DNS server. The software it runs is entirely open source. It maintains several custom DNS entries for services running on my local network. Every outgoing DNS request is guaranteed to be encrypted. For the past few months, I have used this device in my home network and it has been working great. It is secure, performant, minimal, and easy to maintain (only three config files).&lt;&#x2F;p&gt;
 &lt;p&gt;In the future, I will likely add more features to this device. It might be useful to add a VPN service in order to allow me to access my home network from anywhere on the internet. Also, it would be neat to setup some logging &#x2F; metrics collection to analyze network traffic. However, at this point, all of the original project goals have been met. There are probably many easier ways to build a home router, but I learned a lot doing it this way. For now, I am quite happy with this device.&lt;&#x2F;p&gt;
-</description>
-            </item>
-        
-    </channel>
-</rss>
+</content>
+	</entry>
+</feed>

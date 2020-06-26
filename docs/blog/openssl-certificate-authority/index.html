@@ -108,11 +108,11 @@
 <p>By reading the default openssl config file (located at <code>/etc/ssl/openssl.cnf</code> on my system) and the openssl manual pages related to certificate requests and authorities (<a href="https://www.openssl.org/docs/man1.1.1/man1/req.html">req</a>, <a href="https://www.openssl.org/docs/man1.1.1/man1/ca.html">ca</a>, and <a href="https://www.openssl.org/docs/man1.1.1/man5/x509v3_config.html">x509v3_config</a>), I learned about the configuration options and their meanings. Then, through some experimentation (trial and error), I made a basic openssl config file.</p>
 <h4 id="request-configuration">Request Configuration</h4>
 <pre style="background-color:#2b303b;">
-<span style="color:#c0c5ce;">[ req ]
+<code><span style="color:#c0c5ce;">[ req ]
 string_mask = utf8only
 prompt = no
 distinguished_name = req_distinguished_name
-</span></pre>
+</span></code></pre>
 <p>The &quot;req&quot; section configures the behavior of the req sub-command and therefore affects how openssl generates certificate requests (both CA certificate requests and leaf certificate requests).</p>
 <ul>
 <li><code>string_mask = utf8only</code> masks the request to produce only utf8 characters. This is the recommended setting (according to the openssl docs, &quot;this is the PKIX recommendation in RFC2459 after 2003&quot;).</li>
@@ -120,23 +120,23 @@ distinguished_name = req_distinguished_name
 <li><code>distinguished_name = req_distinguished_name</code> specifies the section containing the DN values. So, let's take a look at the &quot;req_distinguished_name&quot; section next.</li>
 </ul>
 <pre style="background-color:#2b303b;">
-<span style="color:#c0c5ce;">[ req_distinguished_name ]
+<code><span style="color:#c0c5ce;">[ req_distinguished_name ]
 C = US
 ST = Colorado
 L = Denver
 O = 0xC45
 CN = Jason Vigil
 emailAddress = jason@0xc45.com
-</span></pre>
+</span></code></pre>
 <p>The &quot;req_distinguished_name&quot; section specifies the DN (distinguished name) values for my certificate requests. Here, I give some information about where I am located (my country, state, and locale), my &quot;organization name&quot;, my common name, and my email. The CA copies this information from certificate requests to signed certificates. Then, anyone can inspect a certificate and identify who it belongs to. Although, for a personal certificate authority, these values may not matter all that much.</p>
 <h4 id="ca-configuration">CA Configuration</h4>
 <pre style="background-color:#2b303b;">
-<span style="color:#c0c5ce;">[ ca ]
+<code><span style="color:#c0c5ce;">[ ca ]
 default_ca = ca_default
-</span></pre>
+</span></code></pre>
 <p>The &quot;ca&quot; section configures the openssl &quot;ca&quot; sub-command. This section affects how the certificate authority behaves when signing certificate requests. It contains only one config value. The <code>default_ca</code> option sets the default section to use for the CA configuration. This value may be overridden on the command line, causing openssl to utilize a different section for configuration. However, for my purposes, I only need one type of CA configuration. So, the <code>ca_default</code> section contains most of the configuration for my CA.</p>
 <pre style="background-color:#2b303b;">
-<span style="color:#c0c5ce;">[ ca_default ]
+<code><span style="color:#c0c5ce;">[ ca_default ]
 dir = ./ca
 certificate = $dir/ca.cert.pem
 private_key = $dir/private/key.pem
@@ -153,7 +153,7 @@ copy_extensions = copy
 unique_subject = no
 preserve = no
 policy = policy_match
-</span></pre>
+</span></code></pre>
 <p>This is the largest section in my config file (and, this is a super simple CA configuration). With additional features (OCSP, certificate revoke capabilities, etc), it could be much more complicated.</p>
 <ul>
 <li>
@@ -185,23 +185,23 @@ policy = policy_match
 </li>
 </ul>
 <pre style="background-color:#2b303b;">
-<span style="color:#c0c5ce;">[ policy_match ]
+<code><span style="color:#c0c5ce;">[ policy_match ]
 countryName = match
 stateOrProvinceName = match
 organizationName = match
 commonName = match
 emailAddress = match
-</span></pre>
+</span></code></pre>
 <p>When the CA uses this policy, it enforces a highly restrictive set of rules for the DN values of certificate requests: all certificate requests must contain the exact same DN values as the CA certificate. Otherwise, the CA will refuse to sign the request. This is fine for my purposes because I am the only user of my CA. Every certificate request that I want to sign will have a matching DN section anyway.</p>
 <p>There are several values allowed for the fields in this section. Rather than <code>match</code>, one could enforce that a certain value is <code>supplied</code>. Or, it could be set to <code>optional</code>. Also, remember, with the <code>preserve = no</code> setting in the CA configuration section, any field not specified in the policy section is silently omitted in the signed certificate.</p>
 <h4 id="ca-certificate-configuration">CA Certificate Configuration</h4>
 <pre style="background-color:#2b303b;">
-<span style="color:#c0c5ce;">[ ca_extensions ]
+<code><span style="color:#c0c5ce;">[ ca_extensions ]
 basicConstraints = critical,CA:true,pathlen:0
 subjectKeyIdentifier = hash
 authorityKeyIdentifier = keyid:always
 keyUsage = keyCertSign
-</span></pre>
+</span></code></pre>
 <p>This section specifies additional configuration (beyond the &quot;ca_default&quot; section) for producing a CA certificate. When creating a CA certificate with the &quot;openssl ca&quot; command, I manually include this section with the &quot;-extensions&quot; flag.</p>
 <ul>
 <li>
@@ -224,12 +224,12 @@ keyUsage = keyCertSign
 </ul>
 <h4 id="leaf-certificate-configuration">Leaf Certificate Configuration</h4>
 <pre style="background-color:#2b303b;">
-<span style="color:#c0c5ce;">[ leaf_extensions ]
+<code><span style="color:#c0c5ce;">[ leaf_extensions ]
 basicConstraints = CA:false
 subjectKeyIdentifier = hash
 authorityKeyIdentifier = keyid:always
 keyUsage = nonRepudiation,digitalSignature,keyEncipherment
-</span></pre>
+</span></code></pre>
 <p>This section specifies additional configuration (beyond the &quot;ca_default&quot; section) for producing a leaf certificate. When creating a leaf certificate with the &quot;openssl ca&quot; command, I manually include this section with the &quot;-extensions&quot; flag.</p>
 <ul>
 <li>
@@ -251,10 +251,10 @@ keyUsage = nonRepudiation,digitalSignature,keyEncipherment
 <li>
 <p>Setup initial directory structure:</p>
 <pre style="background-color:#2b303b;">
-<span style="color:#bf616a;">mkdir -p</span><span style="color:#c0c5ce;"> ca/certs ca/private ca/reqs
+<code><span style="color:#bf616a;">mkdir -p</span><span style="color:#c0c5ce;"> ca/certs ca/private ca/reqs
 </span><span style="color:#bf616a;">touch</span><span style="color:#c0c5ce;"> ca/index.txt
 </span><span style="color:#96b5b4;">echo </span><span style="color:#c0c5ce;">&quot;</span><span style="color:#a3be8c;">1000</span><span style="color:#c0c5ce;">&quot; &gt; ca/serial
-</span></pre>
+</span></code></pre>
 <p>My openssl config file configures the utility to expect a particular directory structure. It is based on the directory structure used by the example openssl <a href="https://www.openssl.org/docs/man1.1.1/man1/CA.pl.html">CA.pl</a> script. There are three directories:</p>
 <ul>
 <li><code>ca/certs</code>: for signed certificates</li>
@@ -270,25 +270,25 @@ keyUsage = nonRepudiation,digitalSignature,keyEncipherment
 <li>
 <p>Generate private key:</p>
 <pre style="background-color:#2b303b;">
-<span style="color:#bf616a;">openssl</span><span style="color:#c0c5ce;"> genrsa</span><span style="color:#bf616a;"> -out</span><span style="color:#c0c5ce;"> ca/private/key.pem 8192
-</span></pre>
+<code><span style="color:#bf616a;">openssl</span><span style="color:#c0c5ce;"> genrsa</span><span style="color:#bf616a;"> -out</span><span style="color:#c0c5ce;"> ca/private/key.pem 8192
+</span></code></pre>
 <p>This will generate an RSA key that is 8192 bits long.</p>
 </li>
 <li>
 <p>Create certificate request:</p>
 <pre style="background-color:#2b303b;">
-<span style="color:#bf616a;">openssl</span><span style="color:#c0c5ce;"> req \
+<code><span style="color:#bf616a;">openssl</span><span style="color:#c0c5ce;"> req \
 </span><span style="color:#bf616a;">    -new </span><span style="color:#c0c5ce;">\
 </span><span style="color:#bf616a;">    -config</span><span style="color:#c0c5ce;"> openssl.cnf \
 </span><span style="color:#bf616a;">    -key</span><span style="color:#c0c5ce;"> ca/private/key.pem \
 </span><span style="color:#bf616a;">    -out</span><span style="color:#c0c5ce;"> ca/ca.req.pem
-</span></pre>
+</span></code></pre>
 <p>This creates a new certificate request using the config file &quot;openssl.cnf&quot; (created before) and the CA private key from the previous step. The resulting certificate request is written to &quot;ca/ca.req.pem&quot;.</p>
 </li>
 <li>
 <p>Self-sign certificate request:</p>
 <pre style="background-color:#2b303b;">
-<span style="color:#bf616a;">openssl</span><span style="color:#c0c5ce;"> ca \
+<code><span style="color:#bf616a;">openssl</span><span style="color:#c0c5ce;"> ca \
 </span><span style="color:#bf616a;">    -selfsign </span><span style="color:#c0c5ce;">\
 </span><span style="color:#bf616a;">    -config</span><span style="color:#c0c5ce;"> openssl.cnf \
 </span><span style="color:#bf616a;">    -extensions</span><span style="color:#c0c5ce;"> ca_extensions \
@@ -296,7 +296,7 @@ keyUsage = nonRepudiation,digitalSignature,keyEncipherment
 </span><span style="color:#bf616a;">    -keyfile</span><span style="color:#c0c5ce;"> ca/private/key.pem \
 </span><span style="color:#bf616a;">    -in</span><span style="color:#c0c5ce;"> ca/ca.req.pem \
 </span><span style="color:#bf616a;">    -out</span><span style="color:#c0c5ce;"> ca/ca.cert.pem
-</span></pre>
+</span></code></pre>
 <p>This command &quot;self-signs&quot; the certificate request. It adds the extensions in the &quot;ca_extensions&quot; section of the config file to the certificate. It overrides the config value &quot;default_days&quot; and makes the certificate valid for 365 days. The certificate is signed with the CA's own private key. This is why it's called a &quot;self-signed&quot; certificate. The resulting root certificate is written to &quot;ca/ca.cert.pem&quot;.</p>
 </li>
 </ol>
@@ -306,39 +306,39 @@ keyUsage = nonRepudiation,digitalSignature,keyEncipherment
 <li>
 <p>Generate private key:</p>
 <pre style="background-color:#2b303b;">
-<span style="color:#bf616a;">openssl</span><span style="color:#c0c5ce;"> genrsa</span><span style="color:#bf616a;"> -out</span><span style="color:#c0c5ce;"> ca/reqs/test.key.pem 8192
-</span></pre>
+<code><span style="color:#bf616a;">openssl</span><span style="color:#c0c5ce;"> genrsa</span><span style="color:#bf616a;"> -out</span><span style="color:#c0c5ce;"> ca/reqs/test.key.pem 8192
+</span></code></pre>
 <p>This will generate an RSA key that is 8192 bits long.</p>
 </li>
 <li>
 <p>Create certificate request:</p>
 <pre style="background-color:#2b303b;">
-<span style="color:#bf616a;">openssl</span><span style="color:#c0c5ce;"> req \
+<code><span style="color:#bf616a;">openssl</span><span style="color:#c0c5ce;"> req \
 </span><span style="color:#bf616a;">    -new </span><span style="color:#c0c5ce;">\
 </span><span style="color:#bf616a;">    -config</span><span style="color:#c0c5ce;"> openssl.cnf \
 </span><span style="color:#bf616a;">    -addext </span><span style="color:#c0c5ce;">&quot;</span><span style="color:#a3be8c;">subjectAltName=DNS:test.mydomain.com</span><span style="color:#c0c5ce;">&quot; \
 </span><span style="color:#bf616a;">    -key</span><span style="color:#c0c5ce;"> ca/reqs/test.key.pem \
 </span><span style="color:#bf616a;">    -out</span><span style="color:#c0c5ce;"> ca/reqs/test.req.pem
-</span></pre>
+</span></code></pre>
 <p>This creates a new certificate request using the config file &quot;openssl.cnf&quot; (created before) and the private key from the previous step. It adds the &quot;subjectAltName&quot; extension to specify the DNS name for the service that will use the leaf certificate. The resulting certificate request is written to &quot;ca/reqs/test.req.pem&quot;.</p>
 </li>
 <li>
 <p>Sign certificate request:</p>
 <pre style="background-color:#2b303b;">
-<span style="color:#bf616a;">openssl</span><span style="color:#c0c5ce;"> ca \
+<code><span style="color:#bf616a;">openssl</span><span style="color:#c0c5ce;"> ca \
 </span><span style="color:#bf616a;">    -config</span><span style="color:#c0c5ce;"> openssl.cnf \
 </span><span style="color:#bf616a;">    -extensions</span><span style="color:#c0c5ce;"> leaf_extensions \
 </span><span style="color:#bf616a;">    -keyfile</span><span style="color:#c0c5ce;"> ca/private/key.pem \
 </span><span style="color:#bf616a;">    -in</span><span style="color:#c0c5ce;"> ca/reqs/test.req.pem \
 </span><span style="color:#bf616a;">    -out</span><span style="color:#c0c5ce;"> ca/reqs/test.cert.pem
-</span></pre>
+</span></code></pre>
 <p>This command signs the certificate request. It adds the extensions in the &quot;leaf_extensions&quot; section of the config file to the certificate. The certificate is signed with the CA private key. The resulting root certificate is written to &quot;ca/reqs/test.cert.pem&quot;.</p>
 </li>
 <li>
 <p>Combine root and leaf certificates:</p>
 <pre style="background-color:#2b303b;">
-<span style="color:#bf616a;">cat</span><span style="color:#c0c5ce;"> ca/reqs/test.cert.pem ca/ca.cert.pem &gt; test.cert.pem
-</span></pre>
+<code><span style="color:#bf616a;">cat</span><span style="color:#c0c5ce;"> ca/reqs/test.cert.pem ca/ca.cert.pem &gt; test.cert.pem
+</span></code></pre>
 <p>Here, we combine the leaf certificate and the root certificate to produce a certificate &quot;chain&quot; (of length two). Any application that receives this chain can verify that the leaf certificate was signed by the private key associated with the root certificate.</p>
 </li>
 </ol>

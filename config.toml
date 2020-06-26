@@ -3,7 +3,7 @@ title = "0xC45"
 description = "0xC45 blog"
 compile_sass = true
 highlight_code = true
-generate_rss = true
+generate_feed = true
 
 [extra]
 author = "Jason Vigil"
