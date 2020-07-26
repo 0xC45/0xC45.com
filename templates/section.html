@@ -13,6 +13,7 @@
             <li>{{ post.month ~ '/' ~ post.day ~ '/' ~ post.year }}: <a href="{{ post.permalink }}">{{ post.title | safe }}</a></li>
             {% endfor %}
         </ul>
+        <a href="{{ get_url(path="atom.xml") | safe }}"><img src="{{ get_url(path="feed-icon.svg") | safe }}" alt="atom feed icon" width="15" height="15"> feed</a>
     </section>
 </article>
 {% endblock content %}
