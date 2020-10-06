@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="author" content="Jason Vigil">
+    <meta name="description" content="0xC45 blog">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <link rel="icon" href="https://0xC45.com/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="https://0xC45.com/style.css">
+    <title>0xC45 - 4x4 Macro Pad</title>
+</head>
+<body>
+<nav>
+    <a href="https://0xC45.com/">
+        <div class="logo">
+            <img src="https://0xC45.com/logo.svg" alt="logo">
+        </div>
+    </a>
+    <ul>
+        <li><a href="https://0xC45.com/">home</a></li>
+        <li><a href="https://0xC45.com/about/">about</a></li>
+        <li><a href="https://0xC45.com/blog/">blog</a></li>
+    </ul>
+</nav>
+<article>
+    <header>
+        <h1>4x4 Macro Pad</h1>
+    </header>
+    <p class="date">10/6/2020</p>
+    <h2>Contents</h2>
+    <ul>
+        
+        <li>
+            <a href="https://0xC45.com/blog/4x4-macro-pad/#overview">Overview</a>
+            
+        </li>
+        
+        <li>
+            <a href="https://0xC45.com/blog/4x4-macro-pad/#build-process">Build Process</a>
+            
+        </li>
+        
+        <li>
+            <a href="https://0xC45.com/blog/4x4-macro-pad/#flash-firmware">Flash Firmware</a>
+            
+        </li>
+        
+        <li>
+            <a href="https://0xC45.com/blog/4x4-macro-pad/#design-keycaps">Design Keycaps</a>
+            
+        </li>
+        
+        <li>
+            <a href="https://0xC45.com/blog/4x4-macro-pad/#conclusion">Conclusion</a>
+            
+        </li>
+        
+        <li>
+            <a href="https://0xC45.com/blog/4x4-macro-pad/#links">Links</a>
+            
+        </li>
+        
+    </ul>
+    <section>
+<h2 id="overview">Overview</h2>
+<p>Last weekend, I built a 4x4 keyboard kit. By this point, many people are familiar with the growing (and outspoken) mechanical keyboard hobbyist community. However, this kit is a bit unique. It's not a full keyboard. Instead, it's a 4x4 &quot;macro pad&quot; intended for sending keyboard shortcut sequences such as muting my microphone, muting my audio, volume up, volume down, etc. Additionally, with some extra software such as AutoHotKey, vastly complex programs could be triggered with the press of a button.</p>
+<h2 id="build-process">Build Process</h2>
+<p>Overall, building the macro pad was a simple and straightforward process. The <a href="https://www.1upkeyboards.com/instructions-downloads/sweet-16-instructions/">kit's build guide</a> provides a nice set of instructions with pictures to explain things. However, unlike many (some?) keyboard kits, the Sweet 16 kit requires soldering a few smaller components, such as the diodes and microcontroller headers. Additionally, the kit requires soldering one &quot;surface-mount&quot; component, the reset switch.</p>
+<p>The parts:
+<img src="https://0xC45.com/blog/4x4-macro-pad/sweet16-parts.jpg" alt="Sweet16 Parts" /></p>
+<p>Completed build:
+<img src="https://0xC45.com/blog/4x4-macro-pad/sweet16-solder-joints.jpg" alt="Sweet16 Solder Joints" /></p>
+<h2 id="flash-firmware">Flash Firmware</h2>
+<p>To program my custom keymap (including multiple keypress macros), I used <a href="https://qmk.fm/">QMK firmware</a>, the most popular keyboard firmware project.</p>
+<p>Using QMK, it's possible to create custom keycodes that, when pressed, trigger a sequence of inputs. So, by pressing one button on the macro pad (or keyboard), the firmware will submit an entire sequence of keycode presses.</p>
+<p>To do this, I defined my custom keycodes in an enum:</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#b48ead;">enum </span><span style="color:#c0c5ce;">macro_keycodes {
+  MICMUTE = SAFE_RANGE,
+  MACRO1,
+  MACRO2,
+  MACRO3,
+  MACRO4,
+  MACRO5,
+  MACRO6,
+  MACRO7,
+  MACRO8
+};
+</span></code></pre>
+<p>Next, I defined a &quot;keymap&quot; array. Each position in the array corresponds to a single button on the 4x4 macro pad:</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#b48ead;">const </span><span style="color:#c0c5ce;">uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
+  [</span><span style="color:#d08770;">0</span><span style="color:#c0c5ce;">] = </span><span style="color:#bf616a;">LAYOUT_ortho_4x4</span><span style="color:#c0c5ce;">( </span><span style="color:#65737e;">/* Base */</span><span style="color:#c0c5ce;">
+    MICMUTE, KC_MUTE, KC_VOLD, KC_VOLU,
+    XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
+    MACRO1,  MACRO2,  MACRO3,  MACRO4,
+    MACRO5,  MACRO6,  MACRO7,  MACRO8
+  ),
+};
+</span></code></pre>
+<p>Lastly, I implemented the <code>process_record_user</code> function to define what should happen when each custom keycode is pressed:</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#b48ead;">bool </span><span style="color:#8fa1b3;">process_record_user</span><span style="color:#c0c5ce;">(uint16_t </span><span style="color:#bf616a;">keycode</span><span style="color:#c0c5ce;">, keyrecord_t *</span><span style="color:#bf616a;">record</span><span style="color:#c0c5ce;">) {
+  </span><span style="color:#b48ead;">switch </span><span style="color:#c0c5ce;">(keycode) {
+  </span><span style="color:#b48ead;">case</span><span style="color:#c0c5ce;"> MICMUTE:
+    </span><span style="color:#b48ead;">if </span><span style="color:#c0c5ce;">(record-&gt;event.</span><span style="color:#bf616a;">pressed</span><span style="color:#c0c5ce;">) {
+      </span><span style="color:#bf616a;">SEND_STRING</span><span style="color:#c0c5ce;">(</span><span style="color:#bf616a;">SS_LCTL</span><span style="color:#c0c5ce;">(</span><span style="color:#bf616a;">SS_LALT</span><span style="color:#c0c5ce;">(</span><span style="color:#bf616a;">SS_LSFT</span><span style="color:#c0c5ce;">(</span><span style="color:#bf616a;">SS_TAP</span><span style="color:#c0c5ce;">(X_F10)))));
+    }
+    </span><span style="color:#b48ead;">break</span><span style="color:#c0c5ce;">;
+  </span><span style="color:#b48ead;">case</span><span style="color:#c0c5ce;"> MACRO1:
+    </span><span style="color:#b48ead;">if </span><span style="color:#c0c5ce;">(record-&gt;event.</span><span style="color:#bf616a;">pressed</span><span style="color:#c0c5ce;">) {
+      </span><span style="color:#bf616a;">SEND_STRING</span><span style="color:#c0c5ce;">(</span><span style="color:#bf616a;">SS_LCTL</span><span style="color:#c0c5ce;">(</span><span style="color:#bf616a;">SS_LALT</span><span style="color:#c0c5ce;">(</span><span style="color:#bf616a;">SS_LSFT</span><span style="color:#c0c5ce;">(</span><span style="color:#bf616a;">SS_TAP</span><span style="color:#c0c5ce;">(X_F1)))));
+    }
+    </span><span style="color:#b48ead;">break</span><span style="color:#c0c5ce;">;
+  </span><span style="color:#65737e;">/*
+   * ... etc
+   */
+  </span><span style="color:#c0c5ce;">}
+  </span><span style="color:#b48ead;">return </span><span style="color:#d08770;">true
+</span><span style="color:#c0c5ce;">}
+</span></code></pre>
+<p>As you can see, I have configured the <code>MICMUTE</code> button to send the entire sequence <code>CTRL+ALT+SHIFT+F10</code>. However, in practice, any arbitrary sequence could be sent for any button. And, that's only beginning to scratch the surface of the capabilities of the QMK firmware.</p>
+<h2 id="design-keycaps">Design Keycaps</h2>
+<p>For this &quot;DIY&quot; kit, it felt important to design my own icons. I'm no graphic designer, but it was kinda fun. To do this, I used &quot;re-legendable&quot; keycaps that snap together with a clear top. Then, I printed the icons on plain white paper, cut them out, and sandwiched each icon in the keycaps. Here's a photo of my efforts:</p>
+<p><img src="https://0xC45.com/blog/4x4-macro-pad/sweet16-completed.jpg" alt="Sweet16 Completed" /></p>
+<h2 id="conclusion">Conclusion</h2>
+<p>This was a pretty quick project, but I felt like it deserved a writeup nevertheless. As a relative beginner at soldering, this kit was a fantastic way to increase my skills and ability beyond the &quot;absolute beginner&quot; level required for most keyboard kits. Furthermore, the final product is quite useful and extensible. Beyond the specific purpose as a simple macro pad keyboard, this hardware is essentially a microcontroller connected to a set of buttons. There are numerous possible applications. It's ripe for hacking. This device could become a MIDI controller, home automation remote, or anything else my imagination might dream up. Until next time.</p>
+<h2 id="links">Links</h2>
+<ol>
+<li>Sweeet 16 Macro Pad Kit: <a href="https://www.1upkeyboards.com/shop/keyboard-kits/macro-pads/sweet-16-macro-pad-black/">https://www.1upkeyboards.com/shop/keyboard-kits/macro-pads/sweet-16-macro-pad-black/</a></li>
+<li>QMK Firmware: <a href="https://qmk.fm/">https://qmk.fm/</a></li>
+<li>My Sweet 16 Keymap: <a href="https://github.com/0xC45/qmk-firmware/blob/master/keyboards/1upkeyboards/sweet16/keymaps/0xC45/keymap.c">https://github.com/0xC45/qmk-firmware/blob/master/keyboards/1upkeyboards/sweet16/keymaps/0xC45/keymap.c</a></li>
+</ol>
+
+    </section>
+</article>
+</body>
+</html>

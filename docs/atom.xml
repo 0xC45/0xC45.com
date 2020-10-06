@@ -5,8 +5,85 @@
 	<link href="https://0xC45.com/atom.xml" rel="self" type="application/atom+xml"/>
 	<link href="https://0xC45.com"/>
 	<generator uri="https://www.getzola.org/">Zola</generator>
-	<updated>2020-07-25T00:00:00+00:00</updated>
+	<updated>2020-10-06T00:00:00+00:00</updated>
 	<id>https://0xC45.com/atom.xml</id>
+	<entry xml:lang="en">
+		<title>4x4 Macro Pad</title>
+		<published>2020-10-06T00:00:00+00:00</published>
+		<updated>2020-10-06T00:00:00+00:00</updated>
+		<link href="https://0xC45.com/blog/4x4-macro-pad/" type="text/html"/>
+		<id>https://0xC45.com/blog/4x4-macro-pad/</id>
+		<content type="html">&lt;h2 id=&quot;overview&quot;&gt;Overview&lt;&#x2F;h2&gt;
+&lt;p&gt;Last weekend, I built a 4x4 keyboard kit. By this point, many people are familiar with the growing (and outspoken) mechanical keyboard hobbyist community. However, this kit is a bit unique. It&#x27;s not a full keyboard. Instead, it&#x27;s a 4x4 &amp;quot;macro pad&amp;quot; intended for sending keyboard shortcut sequences such as muting my microphone, muting my audio, volume up, volume down, etc. Additionally, with some extra software such as AutoHotKey, vastly complex programs could be triggered with the press of a button.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;build-process&quot;&gt;Build Process&lt;&#x2F;h2&gt;
+&lt;p&gt;Overall, building the macro pad was a simple and straightforward process. The &lt;a href=&quot;https:&#x2F;&#x2F;www.1upkeyboards.com&#x2F;instructions-downloads&#x2F;sweet-16-instructions&#x2F;&quot;&gt;kit&#x27;s build guide&lt;&#x2F;a&gt; provides a nice set of instructions with pictures to explain things. However, unlike many (some?) keyboard kits, the Sweet 16 kit requires soldering a few smaller components, such as the diodes and microcontroller headers. Additionally, the kit requires soldering one &amp;quot;surface-mount&amp;quot; component, the reset switch.&lt;&#x2F;p&gt;
+&lt;p&gt;The parts:
+&lt;img src=&quot;https:&#x2F;&#x2F;0xC45.com&#x2F;blog&#x2F;4x4-macro-pad&#x2F;sweet16-parts.jpg&quot; alt=&quot;Sweet16 Parts&quot; &#x2F;&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;Completed build:
+&lt;img src=&quot;https:&#x2F;&#x2F;0xC45.com&#x2F;blog&#x2F;4x4-macro-pad&#x2F;sweet16-solder-joints.jpg&quot; alt=&quot;Sweet16 Solder Joints&quot; &#x2F;&gt;&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;flash-firmware&quot;&gt;Flash Firmware&lt;&#x2F;h2&gt;
+&lt;p&gt;To program my custom keymap (including multiple keypress macros), I used &lt;a href=&quot;https:&#x2F;&#x2F;qmk.fm&#x2F;&quot;&gt;QMK firmware&lt;&#x2F;a&gt;, the most popular keyboard firmware project.&lt;&#x2F;p&gt;
+&lt;p&gt;Using QMK, it&#x27;s possible to create custom keycodes that, when pressed, trigger a sequence of inputs. So, by pressing one button on the macro pad (or keyboard), the firmware will submit an entire sequence of keycode presses.&lt;&#x2F;p&gt;
+&lt;p&gt;To do this, I defined my custom keycodes in an enum:&lt;&#x2F;p&gt;
+&lt;pre style=&quot;background-color:#2b303b;&quot;&gt;
+&lt;code&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;enum &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;macro_keycodes {
+  MICMUTE = SAFE_RANGE,
+  MACRO1,
+  MACRO2,
+  MACRO3,
+  MACRO4,
+  MACRO5,
+  MACRO6,
+  MACRO7,
+  MACRO8
+};
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;Next, I defined a &amp;quot;keymap&amp;quot; array. Each position in the array corresponds to a single button on the 4x4 macro pad:&lt;&#x2F;p&gt;
+&lt;pre style=&quot;background-color:#2b303b;&quot;&gt;
+&lt;code&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;const &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
+  [&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;0&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;] = &lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;LAYOUT_ortho_4x4&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;( &lt;&#x2F;span&gt;&lt;span style=&quot;color:#65737e;&quot;&gt;&#x2F;* Base *&#x2F;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;
+    MICMUTE, KC_MUTE, KC_VOLD, KC_VOLU,
+    XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
+    MACRO1,  MACRO2,  MACRO3,  MACRO4,
+    MACRO5,  MACRO6,  MACRO7,  MACRO8
+  ),
+};
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;Lastly, I implemented the &lt;code&gt;process_record_user&lt;&#x2F;code&gt; function to define what should happen when each custom keycode is pressed:&lt;&#x2F;p&gt;
+&lt;pre style=&quot;background-color:#2b303b;&quot;&gt;
+&lt;code&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;bool &lt;&#x2F;span&gt;&lt;span style=&quot;color:#8fa1b3;&quot;&gt;process_record_user&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;(uint16_t &lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;keycode&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;, keyrecord_t *&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;record&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;) {
+  &lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;switch &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;(keycode) {
+  &lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;case&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt; MICMUTE:
+    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;if &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;(record-&amp;gt;event.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;pressed&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;) {
+      &lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;SEND_STRING&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;SS_LCTL&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;SS_LALT&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;SS_LSFT&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;SS_TAP&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;(X_F10)))));
+    }
+    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;break&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;;
+  &lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;case&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt; MACRO1:
+    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;if &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;(record-&amp;gt;event.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;pressed&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;) {
+      &lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;SEND_STRING&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;SS_LCTL&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;SS_LALT&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;SS_LSFT&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;SS_TAP&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;(X_F1)))));
+    }
+    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;break&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;;
+  &lt;&#x2F;span&gt;&lt;span style=&quot;color:#65737e;&quot;&gt;&#x2F;*
+   * ... etc
+   *&#x2F;
+  &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;}
+  &lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;return &lt;&#x2F;span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;true
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;}
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;As you can see, I have configured the &lt;code&gt;MICMUTE&lt;&#x2F;code&gt; button to send the entire sequence &lt;code&gt;CTRL+ALT+SHIFT+F10&lt;&#x2F;code&gt;. However, in practice, any arbitrary sequence could be sent for any button. And, that&#x27;s only beginning to scratch the surface of the capabilities of the QMK firmware.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;design-keycaps&quot;&gt;Design Keycaps&lt;&#x2F;h2&gt;
+&lt;p&gt;For this &amp;quot;DIY&amp;quot; kit, it felt important to design my own icons. I&#x27;m no graphic designer, but it was kinda fun. To do this, I used &amp;quot;re-legendable&amp;quot; keycaps that snap together with a clear top. Then, I printed the icons on plain white paper, cut them out, and sandwiched each icon in the keycaps. Here&#x27;s a photo of my efforts:&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;img src=&quot;https:&#x2F;&#x2F;0xC45.com&#x2F;blog&#x2F;4x4-macro-pad&#x2F;sweet16-completed.jpg&quot; alt=&quot;Sweet16 Completed&quot; &#x2F;&gt;&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;conclusion&quot;&gt;Conclusion&lt;&#x2F;h2&gt;
+&lt;p&gt;This was a pretty quick project, but I felt like it deserved a writeup nevertheless. As a relative beginner at soldering, this kit was a fantastic way to increase my skills and ability beyond the &amp;quot;absolute beginner&amp;quot; level required for most keyboard kits. Furthermore, the final product is quite useful and extensible. Beyond the specific purpose as a simple macro pad keyboard, this hardware is essentially a microcontroller connected to a set of buttons. There are numerous possible applications. It&#x27;s ripe for hacking. This device could become a MIDI controller, home automation remote, or anything else my imagination might dream up. Until next time.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;links&quot;&gt;Links&lt;&#x2F;h2&gt;
+&lt;ol&gt;
+&lt;li&gt;Sweeet 16 Macro Pad Kit: &lt;a href=&quot;https:&#x2F;&#x2F;www.1upkeyboards.com&#x2F;shop&#x2F;keyboard-kits&#x2F;macro-pads&#x2F;sweet-16-macro-pad-black&#x2F;&quot;&gt;https:&#x2F;&#x2F;www.1upkeyboards.com&#x2F;shop&#x2F;keyboard-kits&#x2F;macro-pads&#x2F;sweet-16-macro-pad-black&#x2F;&lt;&#x2F;a&gt;&lt;&#x2F;li&gt;
+&lt;li&gt;QMK Firmware: &lt;a href=&quot;https:&#x2F;&#x2F;qmk.fm&#x2F;&quot;&gt;https:&#x2F;&#x2F;qmk.fm&#x2F;&lt;&#x2F;a&gt;&lt;&#x2F;li&gt;
+&lt;li&gt;My Sweet 16 Keymap: &lt;a href=&quot;https:&#x2F;&#x2F;github.com&#x2F;0xC45&#x2F;qmk-firmware&#x2F;blob&#x2F;master&#x2F;keyboards&#x2F;1upkeyboards&#x2F;sweet16&#x2F;keymaps&#x2F;0xC45&#x2F;keymap.c&quot;&gt;https:&#x2F;&#x2F;github.com&#x2F;0xC45&#x2F;qmk-firmware&#x2F;blob&#x2F;master&#x2F;keyboards&#x2F;1upkeyboards&#x2F;sweet16&#x2F;keymaps&#x2F;0xC45&#x2F;keymap.c&lt;&#x2F;a&gt;&lt;&#x2F;li&gt;
+&lt;&#x2F;ol&gt;
+</content>
+	</entry>
 	<entry xml:lang="en">
 		<title>Ansible-defined Homelab</title>
 		<published>2020-07-25T00:00:00+00:00</published>
