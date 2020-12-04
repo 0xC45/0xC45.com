@@ -67,8 +67,8 @@
    * ... etc
    *&#x2F;
   &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;}
-  &lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;return &lt;&#x2F;span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;true
-&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;}
+  &lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;return &lt;&#x2F;span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;true&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;;
+}
 &lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
 &lt;p&gt;As you can see, I have configured the &lt;code&gt;MICMUTE&lt;&#x2F;code&gt; button to send the entire sequence &lt;code&gt;CTRL+ALT+SHIFT+F10&lt;&#x2F;code&gt;. However, in practice, any arbitrary sequence could be sent for any button. And, that&#x27;s only beginning to scratch the surface of the capabilities of the QMK firmware.&lt;&#x2F;p&gt;
 &lt;h2 id=&quot;design-keycaps&quot;&gt;Design Keycaps&lt;&#x2F;h2&gt;
