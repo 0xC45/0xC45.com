@@ -116,20 +116,20 @@
 <h3 id="makefile">Makefile</h3>
 <p>Lastly, I use a Makefile to build the site. Because I use a docker image to run Zola, some of the commands are quite complicated. Particularly, it was somewhat difficult to set up UID/GID mapping and port binding. Using a Makefile documents the commands in code and saves me from having to remember them. Here is my Makefile:</p>
 <pre style="background-color:#2b303b;">
-<code><span style="color:#8fa1b3;">.PHONY</span><span style="color:#c0c5ce;">: all</span><span style="color:#8fa1b3;">
-all</span><span style="color:#c0c5ce;">:</span><span style="color:#bf616a;">
-	PROJECT_ROOT</span><span style="color:#c0c5ce;">=</span><span style="color:#a3be8c;">&quot;</span><span style="color:#b48ead;">$$(</span><span style="color:#bf616a;">git rev-parse --show-toplevel</span><span style="color:#b48ead;">)</span><span style="color:#a3be8c;">&quot; &amp;&amp; \
+<code><span style="color:#8fa1b3;">.PHONY</span><span style="color:#c0c5ce;">: all
+</span><span style="color:#8fa1b3;">all</span><span style="color:#c0c5ce;">:
+</span><span style="color:#bf616a;">	PROJECT_ROOT</span><span style="color:#c0c5ce;">=</span><span style="color:#a3be8c;">&quot;</span><span style="color:#b48ead;">$$(</span><span style="color:#bf616a;">git rev-parse --show-toplevel</span><span style="color:#b48ead;">)</span><span style="color:#a3be8c;">&quot; &amp;&amp; \
 	docker run \
 	  --rm \
 	  -it \
 	  -u </span><span style="color:#b48ead;">$$(</span><span style="color:#bf616a;">id -u </span><span style="color:#b48ead;">$${</span><span style="color:#bf616a;">USER</span><span style="color:#b48ead;">})</span><span style="color:#a3be8c;">:</span><span style="color:#b48ead;">$$(</span><span style="color:#bf616a;">id -g </span><span style="color:#b48ead;">$${</span><span style="color:#bf616a;">USER</span><span style="color:#b48ead;">}) </span><span style="color:#a3be8c;">\
 	  -v &quot;</span><span style="color:#b48ead;">$${</span><span style="color:#bf616a;">PROJECT_ROOT</span><span style="color:#b48ead;">}</span><span style="color:#a3be8c;">:/site&quot; \
 	  zola:v0.11.0 \
-	  bash -c &#39;cd /site &amp;&amp; zola build -o docs&#39;</span><span style="color:#8fa1b3;">
+	  bash -c &#39;cd /site &amp;&amp; zola build -o docs&#39;
 
-.PHONY</span><span style="color:#c0c5ce;">: serve</span><span style="color:#8fa1b3;">
-serve</span><span style="color:#c0c5ce;">:</span><span style="color:#bf616a;">
-	PROJECT_ROOT</span><span style="color:#c0c5ce;">=</span><span style="color:#a3be8c;">&quot;</span><span style="color:#b48ead;">$$(</span><span style="color:#bf616a;">git rev-parse --show-toplevel</span><span style="color:#b48ead;">)</span><span style="color:#a3be8c;">&quot; &amp;&amp; \
+</span><span style="color:#8fa1b3;">.PHONY</span><span style="color:#c0c5ce;">: serve
+</span><span style="color:#8fa1b3;">serve</span><span style="color:#c0c5ce;">:
+</span><span style="color:#bf616a;">	PROJECT_ROOT</span><span style="color:#c0c5ce;">=</span><span style="color:#a3be8c;">&quot;</span><span style="color:#b48ead;">$$(</span><span style="color:#bf616a;">git rev-parse --show-toplevel</span><span style="color:#b48ead;">)</span><span style="color:#a3be8c;">&quot; &amp;&amp; \
 	docker run \
 	  --rm \
 	  -it \
@@ -137,9 +137,9 @@ serve</span><span style="color:#c0c5ce;">:</span><span style="color:#bf616a;">
 	  -v &quot;</span><span style="color:#b48ead;">$${</span><span style="color:#bf616a;">PROJECT_ROOT</span><span style="color:#b48ead;">}</span><span style="color:#a3be8c;">:/site&quot; \
 	  -p 127.0.0.1:1111:1111 \
 	  zola:v0.11.0 \
-	  bash -c &#39;cd /site &amp;&amp; zola serve -i 0.0.0.0&#39;</span><span style="color:#8fa1b3;">
+	  bash -c &#39;cd /site &amp;&amp; zola serve -i 0.0.0.0&#39;
 
-.PHONY</span><span style="color:#c0c5ce;">: </span><span style="color:#a3be8c;">clean
+</span><span style="color:#8fa1b3;">.PHONY</span><span style="color:#c0c5ce;">: </span><span style="color:#a3be8c;">clean
 </span><span style="color:#8fa1b3;">clean</span><span style="color:#c0c5ce;">:
 	</span><span style="color:#a3be8c;">rm -rf docs/
 </span></code></pre>

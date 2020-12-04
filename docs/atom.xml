@@ -3,7 +3,7 @@
 	<title>0xC45</title>
 	<subtitle>0xC45 blog</subtitle>
 	<link href="https://0xC45.com/atom.xml" rel="self" type="application/atom+xml"/>
-	<link href="https://0xC45.com"/>
+  <link href="https://0xC45.com"/>
 	<generator uri="https://www.getzola.org/">Zola</generator>
 	<updated>2020-10-06T00:00:00+00:00</updated>
 	<id>https://0xC45.com/atom.xml</id>
@@ -41,8 +41,8 @@
 &lt;p&gt;Next, I defined a &amp;quot;keymap&amp;quot; array. Each position in the array corresponds to a single button on the 4x4 macro pad:&lt;&#x2F;p&gt;
 &lt;pre style=&quot;background-color:#2b303b;&quot;&gt;
 &lt;code&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;const &lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
-  [&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;0&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;] = &lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;LAYOUT_ortho_4x4&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;( &lt;&#x2F;span&gt;&lt;span style=&quot;color:#65737e;&quot;&gt;&#x2F;* Base *&#x2F;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;
-    MICMUTE, KC_MUTE, KC_VOLD, KC_VOLU,
+  [&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;0&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;] = &lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;LAYOUT_ortho_4x4&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;( &lt;&#x2F;span&gt;&lt;span style=&quot;color:#65737e;&quot;&gt;&#x2F;* Base *&#x2F;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;    MICMUTE, KC_MUTE, KC_VOLD, KC_VOLU,
     XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
     MACRO1,  MACRO2,  MACRO3,  MACRO4,
     MACRO5,  MACRO6,  MACRO7,  MACRO8
@@ -186,20 +186,20 @@
 &lt;h3 id=&quot;makefile&quot;&gt;Makefile&lt;&#x2F;h3&gt;
 &lt;p&gt;Lastly, I use a Makefile to build the site. Because I use a docker image to run Zola, some of the commands are quite complicated. Particularly, it was somewhat difficult to set up UID&#x2F;GID mapping and port binding. Using a Makefile documents the commands in code and saves me from having to remember them. Here is my Makefile:&lt;&#x2F;p&gt;
 &lt;pre style=&quot;background-color:#2b303b;&quot;&gt;
-&lt;code&gt;&lt;span style=&quot;color:#8fa1b3;&quot;&gt;.PHONY&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;: all&lt;&#x2F;span&gt;&lt;span style=&quot;color:#8fa1b3;&quot;&gt;
-all&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;:&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;
-	PROJECT_ROOT&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;=&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a3be8c;&quot;&gt;&amp;quot;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;$$(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;git rev-parse --show-toplevel&lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;)&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a3be8c;&quot;&gt;&amp;quot; &amp;amp;&amp;amp; \
+&lt;code&gt;&lt;span style=&quot;color:#8fa1b3;&quot;&gt;.PHONY&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;: all
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#8fa1b3;&quot;&gt;all&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;:
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;	PROJECT_ROOT&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;=&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a3be8c;&quot;&gt;&amp;quot;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;$$(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;git rev-parse --show-toplevel&lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;)&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a3be8c;&quot;&gt;&amp;quot; &amp;amp;&amp;amp; \
 	docker run \
 	  --rm \
 	  -it \
 	  -u &lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;$$(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;id -u &lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;$${&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;USER&lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;})&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a3be8c;&quot;&gt;:&lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;$$(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;id -g &lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;$${&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;USER&lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;}) &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a3be8c;&quot;&gt;\
 	  -v &amp;quot;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;$${&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;PROJECT_ROOT&lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;}&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a3be8c;&quot;&gt;:&#x2F;site&amp;quot; \
 	  zola:v0.11.0 \
-	  bash -c &amp;#39;cd &#x2F;site &amp;amp;&amp;amp; zola build -o docs&amp;#39;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#8fa1b3;&quot;&gt;
+	  bash -c &amp;#39;cd &#x2F;site &amp;amp;&amp;amp; zola build -o docs&amp;#39;
 
-.PHONY&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;: serve&lt;&#x2F;span&gt;&lt;span style=&quot;color:#8fa1b3;&quot;&gt;
-serve&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;:&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;
-	PROJECT_ROOT&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;=&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a3be8c;&quot;&gt;&amp;quot;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;$$(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;git rev-parse --show-toplevel&lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;)&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a3be8c;&quot;&gt;&amp;quot; &amp;amp;&amp;amp; \
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#8fa1b3;&quot;&gt;.PHONY&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;: serve
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#8fa1b3;&quot;&gt;serve&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;:
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;	PROJECT_ROOT&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;=&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a3be8c;&quot;&gt;&amp;quot;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;$$(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;git rev-parse --show-toplevel&lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;)&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a3be8c;&quot;&gt;&amp;quot; &amp;amp;&amp;amp; \
 	docker run \
 	  --rm \
 	  -it \
@@ -207,9 +207,9 @@ serve&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;:&lt;&#x2F;s
 	  -v &amp;quot;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;$${&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;PROJECT_ROOT&lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;}&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a3be8c;&quot;&gt;:&#x2F;site&amp;quot; \
 	  -p 127.0.0.1:1111:1111 \
 	  zola:v0.11.0 \
-	  bash -c &amp;#39;cd &#x2F;site &amp;amp;&amp;amp; zola serve -i 0.0.0.0&amp;#39;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#8fa1b3;&quot;&gt;
+	  bash -c &amp;#39;cd &#x2F;site &amp;amp;&amp;amp; zola serve -i 0.0.0.0&amp;#39;
 
-.PHONY&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;: &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a3be8c;&quot;&gt;clean
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#8fa1b3;&quot;&gt;.PHONY&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;: &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a3be8c;&quot;&gt;clean
 &lt;&#x2F;span&gt;&lt;span style=&quot;color:#8fa1b3;&quot;&gt;clean&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c0c5ce;&quot;&gt;:
 	&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a3be8c;&quot;&gt;rm -rf docs&#x2F;
 &lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
