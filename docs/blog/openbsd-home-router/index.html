@@ -97,8 +97,7 @@
 <h2 id="hardware-apu2">Hardware (apu2)</h2>
 <p>First, I needed an actual machine for my home network appliance. After considering the various options (purchase a device, build something myself, use a virtual machine, etc.) I decided to use an <a href="https://pcengines.ch/apu2.htm">apu2</a>. It is a low-power, relatively inexpensive yet performant solution, which makes it ideal for this kind of application. In addition, it uses an open source BIOS (<a href="https://github.com/pcengines/seabios">SeaBIOS</a>) and firmware (<a href="https://github.com/pcengines/coreboot">coreboot</a>). I went with a model that has a quad-core processor, 4GB memory, and 3 separate gigabit NICs. In addition, I purchased a 16GB M-SATA SSD (for the main OS installation), a 4GB SD (for a utility OS installation), a case, and a serial cable (the apu2 does not have a port for graphics output). The total cost was roughly $160.</p>
 <p>After the device arrived, the first challenge was connecting to it. Ok, it wasn't actually that challenging. I connected to the apu2 with my OpenBSD netbook and the serial cable:</p>
-<pre style="background-color:#2b303b;">
-<code><span style="color:#c0c5ce;">cu -l /dev/cuaU0 -s 115200
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>cu -l /dev/cuaU0 -s 115200
 </span></code></pre>
 <p>No matter which software you use to connect to the apu2 over serial, the important setting is the default baud rate, 115200.</p>
 <h2 id="firmware-coreboot">Firmware (coreboot)</h2>
@@ -124,19 +123,16 @@
 </li>
 </ul>
 <p>In order to boot the new Debian installation for the first time, I had to manually edit the boot entry. Like before, add <code>console=ttyS0,115200n8</code> to boot into a serial tty. Then, after booting and logging in as root, I configured grub so that it would no longer be necessary to manually edit the boot entry. To do that, edit /etc/default/grub and change the following settings:</p>
-<pre style="background-color:#2b303b;">
-<code><span style="color:#c0c5ce;">GRUB_CMDLINE_LINUX=&#39;console=ttyS0,19200n8&#39;
-GRUB_TERMINAL=serial
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>GRUB_CMDLINE_LINUX=&#39;console=ttyS0,19200n8&#39;
+</span><span>GRUB_TERMINAL=serial
 </span></code></pre>
 <p>Finally, run <code>update-grub</code> to regenerate the grub boot menu. At this point, the Debian &quot;utility&quot; OS install is complete and it is time to update the BIOS.</p>
 <h3 id="firmware-update">Firmware Update</h3>
 <p>Updating the BIOS is fairly simple. First, install the flashrom utility. It's available in the Debian package repositories.</p>
-<pre style="background-color:#2b303b;">
-<code><span style="color:#c0c5ce;">apt install flashrom
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>apt install flashrom
 </span></code></pre>
 <p>Then, download the latest mainline version of the firmware from <a href="https://pcengines.github.io/">https://pcengines.github.io/</a>, write the file to a USB, and mount the USB on the apu2. To flash the firmware (assuming the file is named coreboot.rom), run:</p>
-<pre style="background-color:#2b303b;">
-<code><span style="color:#c0c5ce;">flashrom -w coreboot.rom -p internal
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>flashrom -w coreboot.rom -p internal
 </span></code></pre>
 <p>Then, reboot. For more information on flashing the apu2 firmware, check out the <a href="https://github.com/pcengines/apu2-documentation/blob/master/docs/firmware_flashing.md">docs</a>.</p>
 <h2 id="os-openbsd">OS (OpenBSD)</h2>
@@ -149,9 +145,8 @@ GRUB_TERMINAL=serial
 <li>
 <p>Boot the apu2 from the OpenBSD installer USB drive.</p>
 <p>At the <code>boot&gt;</code> prompt, configure and enable a serial tty by entering the following commands.</p>
-<pre style="background-color:#2b303b;">
-<code><span style="color:#c0c5ce;">stty com0 115200
-</span><span style="color:#c0c5ce;">set tty com0
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>stty com0 115200
+</span><span>set tty com0
 </span></code></pre>
 <p>Now, press enter at the <code>boot&gt;</code> prompt to boot the installer.</p>
 </li>
@@ -161,162 +156,151 @@ GRUB_TERMINAL=serial
 <li>
 <p>Erase the target installation disk.</p>
 <p>To determine the identifier for the target installation disk, check <code>dmesg</code> (In was sd0 in my case).</p>
-<pre style="background-color:#2b303b;">
-<code><span style="color:#c0c5ce;">cd /dev &amp;&amp; sh MAKEDEV sd0
-</span><span style="color:#c0c5ce;">dd if=/dev/urandom of=/dev/rsd0c bs=1m
-</span></code></pre></li>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>cd /dev &amp;&amp; sh MAKEDEV sd0
+</span><span>dd if=/dev/urandom of=/dev/rsd0c bs=1m
+</span></code></pre>
+</li>
 <li>
 <p>Setup the disk MBR.</p>
-<pre style="background-color:#2b303b;">
-<code><span style="color:#c0c5ce;">fdisk -iy sd0
-</span></code></pre></li>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>fdisk -iy sd0
+</span></code></pre>
+</li>
 <li>
 <p>Create a RAID partition to use as an encrypted pseudo-device.</p>
 <p>Run the disk label editor.</p>
-<pre style="background-color:#2b303b;">
-<code><span style="color:#c0c5ce;">disklabel -E sd0
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>disklabel -E sd0
 </span></code></pre>
 <p>In the disk label editor, enter the following commands to create a RAID partition over the entire disk.</p>
-<pre style="background-color:#2b303b;">
-<code><span style="color:#c0c5ce;">a a
-</span><span style="color:#c0c5ce;">&lt;enter&gt;
-</span><span style="color:#c0c5ce;">&lt;enter&gt;
-</span><span style="color:#c0c5ce;">RAID
-</span><span style="color:#c0c5ce;">p
-</span><span style="color:#c0c5ce;">w
-</span><span style="color:#c0c5ce;">q
-</span></code></pre></li>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>a a
+</span><span>&lt;enter&gt;
+</span><span>&lt;enter&gt;
+</span><span>RAID
+</span><span>p
+</span><span>w
+</span><span>q
+</span></code></pre>
+</li>
 <li>
 <p>Create the encrypted pseudo-device and set the encryption password.</p>
-<pre style="background-color:#2b303b;">
-<code><span style="color:#c0c5ce;">bioctl -c C -l sd0a softraid0
-</span><span style="color:#c0c5ce;"># use the device identifier created in the previous command (sd3 for me)
-</span><span style="color:#c0c5ce;">cd /dev &amp;&amp; sh MAKEDEV sd3
-</span></code></pre></li>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>bioctl -c C -l sd0a softraid0
+</span><span># use the device identifier created in the previous command (sd3 for me)
+</span><span>cd /dev &amp;&amp; sh MAKEDEV sd3
+</span></code></pre>
+</li>
 <li>
 <p>Clear the first megabyte of the new pseudo-device.</p>
 <p>If you're unlucky, the random data written to the device may look like a real disk header. Clearing out the first megabyte fixes this potential issue.</p>
-<pre style="background-color:#2b303b;">
-<code><span style="color:#c0c5ce;">dd if=/dev/zero of=/dev/rsd3c bs=1m count=1
-</span></code></pre></li>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>dd if=/dev/zero of=/dev/rsd3c bs=1m count=1
+</span></code></pre>
+</li>
 <li>
 <p>Return to the main installer menu.</p>
-<pre style="background-color:#2b303b;">
-<code><span style="color:#c0c5ce;">exit
-</span></code></pre></li>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>exit
+</span></code></pre>
+</li>
 <li>
 <p>Type <code>i</code> to run the installer.</p>
-<pre style="background-color:#2b303b;">
-<code><span style="color:#c0c5ce;">Terminal type? &lt;enter&gt; (the default seemed to work fine for me)
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>Terminal type? &lt;enter&gt; (the default seemed to work fine for me)
 </span></code></pre>
 <p>Next, set the system hostname and configure the network interfaces.</p>
-<pre style="background-color:#2b303b;">
-<code><span style="color:#c0c5ce;">System hostname? firewall (in my case)
-</span><span style="color:#c0c5ce;">Which nic to configure? em0 (this will be the WAN interface)
-</span><span style="color:#c0c5ce;">IPv4 address? 192.168.0.2 (in my case)
-</span><span style="color:#c0c5ce;">Netmask? 255.255.255.0 (in my case)
-</span><span style="color:#c0c5ce;">IPv6 address? none (in my case)
-</span><span style="color:#c0c5ce;">Which nic to configure? em1 (this will be the &quot;prod&quot; network interface)
-</span><span style="color:#c0c5ce;">Symbolic hostname? &lt;enter&gt; (same as system hostname)
-</span><span style="color:#c0c5ce;">IPv4 address? 192.168.1.1 (in my case)
-</span><span style="color:#c0c5ce;">Netmask? 255.255.255.0 (in my case)
-</span><span style="color:#c0c5ce;">IPv6 address? none (in my case)
-</span><span style="color:#c0c5ce;">Which nic to configure? em2 (this will be the &quot;dev&quot; network interface&quot;)
-</span><span style="color:#c0c5ce;">Symbolic hostname? &lt;enter&gt; (same as system hostname)
-</span><span style="color:#c0c5ce;">IPv4 address? 192.168.2.1 (in my case)
-</span><span style="color:#c0c5ce;">Netmask? 255.255.255.0 (in my case)
-</span><span style="color:#c0c5ce;">IPv6 address? none (in my case)
-</span><span style="color:#c0c5ce;">Which nic to configure? done
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>System hostname? firewall (in my case)
+</span><span>Which nic to configure? em0 (this will be the WAN interface)
+</span><span>IPv4 address? 192.168.0.2 (in my case)
+</span><span>Netmask? 255.255.255.0 (in my case)
+</span><span>IPv6 address? none (in my case)
+</span><span>Which nic to configure? em1 (this will be the &quot;prod&quot; network interface)
+</span><span>Symbolic hostname? &lt;enter&gt; (same as system hostname)
+</span><span>IPv4 address? 192.168.1.1 (in my case)
+</span><span>Netmask? 255.255.255.0 (in my case)
+</span><span>IPv6 address? none (in my case)
+</span><span>Which nic to configure? em2 (this will be the &quot;dev&quot; network interface&quot;)
+</span><span>Symbolic hostname? &lt;enter&gt; (same as system hostname)
+</span><span>IPv4 address? 192.168.2.1 (in my case)
+</span><span>Netmask? 255.255.255.0 (in my case)
+</span><span>IPv6 address? none (in my case)
+</span><span>Which nic to configure? done
 </span></code></pre>
 <p>Next, set the default route and configure DNS.</p>
-<pre style="background-color:#2b303b;">
-<code><span style="color:#c0c5ce;">Default route? 192.168.0.1 (in my case)
-</span><span style="color:#c0c5ce;">DNS domain name? localdomain (in my case)
-</span><span style="color:#c0c5ce;">DNS nameservers? 8.8.8.8 8.8.4.4 (for now)
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>Default route? 192.168.0.1 (in my case)
+</span><span>DNS domain name? localdomain (in my case)
+</span><span>DNS nameservers? 8.8.8.8 8.8.4.4 (for now)
 </span></code></pre>
 <p>Next, there are some miscellaneous tasks: set the root password, enable ssh, setup serial console, create a user, and set your timezone.</p>
-<pre style="background-color:#2b303b;">
-<code><span style="color:#c0c5ce;">Password for root account? (something secure)
-</span><span style="color:#c0c5ce;">Start sshd by default? yes (not necessary, but useful)
-</span><span style="color:#c0c5ce;">Change default console to com0? yes
-</span><span style="color:#c0c5ce;">Which speed should com0 use? 115200
-</span><span style="color:#c0c5ce;">Setup a user? (choose a username)
-</span><span style="color:#c0c5ce;">Full name? &lt;enter&gt;
-</span><span style="color:#c0c5ce;">Password? (something secure)
-</span><span style="color:#c0c5ce;">Allow root ssh login? no
-</span><span style="color:#c0c5ce;">What timezone? (set your timezone)
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>Password for root account? (something secure)
+</span><span>Start sshd by default? yes (not necessary, but useful)
+</span><span>Change default console to com0? yes
+</span><span>Which speed should com0 use? 115200
+</span><span>Setup a user? (choose a username)
+</span><span>Full name? &lt;enter&gt;
+</span><span>Password? (something secure)
+</span><span>Allow root ssh login? no
+</span><span>What timezone? (set your timezone)
 </span></code></pre>
 <p>Next, partition your target installation disk (the encrypted pseudo-device).</p>
-<pre style="background-color:#2b303b;">
-<code><span style="color:#c0c5ce;">Which disk is the root disk? sd3 (pseudo-device from previous steps)
-</span><span style="color:#c0c5ce;">Whole disk MBR? whole
-</span><span style="color:#c0c5ce;">Disk partitioning? c (setup custom layout)
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>Which disk is the root disk? sd3 (pseudo-device from previous steps)
+</span><span>Whole disk MBR? whole
+</span><span>Disk partitioning? c (setup custom layout)
 </span></code></pre>
 <p>Here are the commands I used to partition my disk.</p>
-<pre style="background-color:#2b303b;">
-<code><span style="color:#c0c5ce;">a a
-</span><span style="color:#c0c5ce;">&lt;enter&gt;
-</span><span style="color:#c0c5ce;">6G
-</span><span style="color:#c0c5ce;">&lt;enter&gt;
-</span><span style="color:#c0c5ce;">/
-</span><span style="color:#c0c5ce;">a b
-</span><span style="color:#c0c5ce;">&lt;enter&gt;
-</span><span style="color:#c0c5ce;">4G
-</span><span style="color:#c0c5ce;">&lt;enter&gt;
-</span><span style="color:#c0c5ce;">a d
-</span><span style="color:#c0c5ce;">&lt;enter&gt;
-</span><span style="color:#c0c5ce;">0.1G
-</span><span style="color:#c0c5ce;">&lt;enter&gt;
-</span><span style="color:#c0c5ce;">/usr/local
-</span><span style="color:#c0c5ce;">a e
-</span><span style="color:#c0c5ce;">&lt;enter&gt;
-</span><span style="color:#c0c5ce;">4G
-</span><span style="color:#c0c5ce;">&lt;enter&gt;
-</span><span style="color:#c0c5ce;">/var
-</span><span style="color:#c0c5ce;">a f
-</span><span style="color:#c0c5ce;">&lt;enter&gt;
-</span><span style="color:#c0c5ce;">&lt;enter&gt;
-</span><span style="color:#c0c5ce;">&lt;enter&gt;
-</span><span style="color:#c0c5ce;">/tmp
-</span><span style="color:#c0c5ce;">p
-</span><span style="color:#c0c5ce;">w
-</span><span style="color:#c0c5ce;">q
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>a a
+</span><span>&lt;enter&gt;
+</span><span>6G
+</span><span>&lt;enter&gt;
+</span><span>/
+</span><span>a b
+</span><span>&lt;enter&gt;
+</span><span>4G
+</span><span>&lt;enter&gt;
+</span><span>a d
+</span><span>&lt;enter&gt;
+</span><span>0.1G
+</span><span>&lt;enter&gt;
+</span><span>/usr/local
+</span><span>a e
+</span><span>&lt;enter&gt;
+</span><span>4G
+</span><span>&lt;enter&gt;
+</span><span>/var
+</span><span>a f
+</span><span>&lt;enter&gt;
+</span><span>&lt;enter&gt;
+</span><span>&lt;enter&gt;
+</span><span>/tmp
+</span><span>p
+</span><span>w
+</span><span>q
 </span></code></pre>
 <p>My disk ended up being partitioned as follows:</p>
-<pre style="background-color:#2b303b;">
-<code><span style="color:#c0c5ce;">#   size       offset     fstype   [fsize   bsize   cpg]
-</span><span style="color:#c0c5ce;">a:  12594880   64         4.2BSD    2048    16384   1      # /
-</span><span style="color:#c0c5ce;">b:  8402011    12594944   swap
-</span><span style="color:#c0c5ce;">c:  31261898   0          unused
-</span><span style="color:#c0c5ce;">d:  224896     20996960   4.2BSD    2048    16384   1      # /usr/local
-</span><span style="color:#c0c5ce;">e:  8401984    21221856   4.2BSD    2048    16384   1      # /var
-</span><span style="color:#c0c5ce;">f:  1622560    29623840   4.2BSD    2048    16384   1      # /tmp
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>#   size       offset     fstype   [fsize   bsize   cpg]
+</span><span>a:  12594880   64         4.2BSD    2048    16384   1      # /
+</span><span>b:  8402011    12594944   swap
+</span><span>c:  31261898   0          unused
+</span><span>d:  224896     20996960   4.2BSD    2048    16384   1      # /usr/local
+</span><span>e:  8401984    21221856   4.2BSD    2048    16384   1      # /var
+</span><span>f:  1622560    29623840   4.2BSD    2048    16384   1      # /tmp
 </span></code></pre>
 <p>Finish partitioning disks.</p>
-<pre style="background-color:#2b303b;">
-<code><span style="color:#c0c5ce;">Which disk to initialize? done
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>Which disk to initialize? done
 </span></code></pre>
 <p>Before installing the sets, type <code>!</code> to exit to a shell and determine the device identifier of the OpenBSD 6.6 installer USB drive. Then, return to the installer.</p>
-<pre style="background-color:#2b303b;">
-<code><span style="color:#c0c5ce;">!
-</span><span style="color:#c0c5ce;">dmesg  # for me, the device identifier ended up being sd2
-</span><span style="color:#c0c5ce;">exit
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>!
+</span><span>dmesg  # for me, the device identifier ended up being sd2
+</span><span>exit
 </span></code></pre>
 <p>Next, mount the OpenBSD 6.6 installer USB drive and load the sets.</p>
-<pre style="background-color:#2b303b;">
-<code><span style="color:#c0c5ce;">Location of sets? disk
-</span><span style="color:#c0c5ce;">Already mounted? no
-</span><span style="color:#c0c5ce;">Which disk contains the install media? sd2 (as just determined)
-</span><span style="color:#c0c5ce;">Which partition has the install sets? &lt;enter&gt;
-</span><span style="color:#c0c5ce;">Pathname to the sets? &lt;enter&gt;
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>Location of sets? disk
+</span><span>Already mounted? no
+</span><span>Which disk contains the install media? sd2 (as just determined)
+</span><span>Which partition has the install sets? &lt;enter&gt;
+</span><span>Pathname to the sets? &lt;enter&gt;
 </span></code></pre>
 <p>Next, select which sets to install and install them.</p>
-<pre style="background-color:#2b303b;">
-<code><span style="color:#c0c5ce;">Set name(s)? -game* -x* (no need for games or a gui)
-</span><span style="color:#c0c5ce;">Set name(s)? done
-</span><span style="color:#c0c5ce;">Continue without verification? yes
-</span><span style="color:#c0c5ce;">Location of sets? done
-</span></code></pre></li>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>Set name(s)? -game* -x* (no need for games or a gui)
+</span><span>Set name(s)? done
+</span><span>Continue without verification? yes
+</span><span>Location of sets? done
+</span></code></pre>
+</li>
 </ol>
 <p>Success! Reboot the device. Don't forget to run <code>syspatch</code> after rebooting in order to apply the latest patches.</p>
 <h2 id="firewall-pf">Firewall (pf)</h2>
@@ -329,60 +313,58 @@ GRUB_TERMINAL=serial
 <li>My router exists on a local network (behind my ISP-supplied modem/router) so I had to allow traffic destined to the gateway at 192.168.0.1.</li>
 </ol>
 <p>Here is my /etc/pf.conf that achieves this desired configuration.</p>
-<pre style="background-color:#2b303b;">
-<code><span style="color:#c0c5ce;"># interfaces
-lo_if = &quot;lo0&quot;
-wan_if = &quot;em0&quot;
-prod_if = &quot;em1&quot;
-dev_if = &quot;em2&quot;
-
-# cidr ranges
-prod_range = &quot;192.168.1.0/24&quot;
-dev_range = &quot;192.168.2.0/24&quot;
-
-# setup non-routable address list
-# note: since this firewall is behind a local network,
-#       do not include the default gateway in the table
-table &lt;martians&gt; { 0.0.0.0/8 10.0.0.0/8 127.0.0.0/8 169.254.0.0/16     \
-                   172.16.0.0/12 192.0.0.0/24 192.0.2.0/24 224.0.0.0/3 \
-                   192.168.0.0/16 198.18.0.0/15 198.51.100.0/24        \
-                   203.0.113.0/24 !192.168.0.1 }
-
-# drop blocked traffic
-set block-policy drop
-# set interface for logging
-set loginterface $wan_if
-# ignore loopback traffic
-set skip on $lo_if
-
-# normalize incoming packets
-match in all scrub (no-df random-id max-mss 1460)
-# perform NAT
-match out on $wan_if inet from !($wan_if:network) to any nat-to ($wan_if:0)
-
-# prevent spoofed traffic
-antispoof quick for { $wan_if $prod_if $dev_if }
-
-# block non-routable traffic
-block in quick on $wan_if from &lt;martians&gt; to any
-block return out quick on $wan_if from any to &lt;martians&gt;
-
-# block all traffic
-block all
-# allow outgoing traffic
-pass out inet
-# allow traffic from internal networks
-pass in on { $prod_if $dev_if } inet
-# block traffic from prod &lt;--&gt; dev
-block in on $prod_if from $prod_range to $dev_range
-block in on $dev_if from $dev_range to $prod_range
-# block outgoing unencrypted dns requests
-block proto { TCP UDP } from { $prod_range $dev_range } to any port 53
-pass proto { TCP UDP } from { $prod_range $dev_range} to self port 53
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span># interfaces
+</span><span>lo_if = &quot;lo0&quot;
+</span><span>wan_if = &quot;em0&quot;
+</span><span>prod_if = &quot;em1&quot;
+</span><span>dev_if = &quot;em2&quot;
+</span><span>
+</span><span># cidr ranges
+</span><span>prod_range = &quot;192.168.1.0/24&quot;
+</span><span>dev_range = &quot;192.168.2.0/24&quot;
+</span><span>
+</span><span># setup non-routable address list
+</span><span># note: since this firewall is behind a local network,
+</span><span>#       do not include the default gateway in the table
+</span><span>table &lt;martians&gt; { 0.0.0.0/8 10.0.0.0/8 127.0.0.0/8 169.254.0.0/16     \
+</span><span>                   172.16.0.0/12 192.0.0.0/24 192.0.2.0/24 224.0.0.0/3 \
+</span><span>                   192.168.0.0/16 198.18.0.0/15 198.51.100.0/24        \
+</span><span>                   203.0.113.0/24 !192.168.0.1 }
+</span><span>
+</span><span># drop blocked traffic
+</span><span>set block-policy drop
+</span><span># set interface for logging
+</span><span>set loginterface $wan_if
+</span><span># ignore loopback traffic
+</span><span>set skip on $lo_if
+</span><span>
+</span><span># normalize incoming packets
+</span><span>match in all scrub (no-df random-id max-mss 1460)
+</span><span># perform NAT
+</span><span>match out on $wan_if inet from !($wan_if:network) to any nat-to ($wan_if:0)
+</span><span>
+</span><span># prevent spoofed traffic
+</span><span>antispoof quick for { $wan_if $prod_if $dev_if }
+</span><span>
+</span><span># block non-routable traffic
+</span><span>block in quick on $wan_if from &lt;martians&gt; to any
+</span><span>block return out quick on $wan_if from any to &lt;martians&gt;
+</span><span>
+</span><span># block all traffic
+</span><span>block all
+</span><span># allow outgoing traffic
+</span><span>pass out inet
+</span><span># allow traffic from internal networks
+</span><span>pass in on { $prod_if $dev_if } inet
+</span><span># block traffic from prod &lt;--&gt; dev
+</span><span>block in on $prod_if from $prod_range to $dev_range
+</span><span>block in on $dev_if from $dev_range to $prod_range
+</span><span># block outgoing unencrypted dns requests
+</span><span>block proto { TCP UDP } from { $prod_range $dev_range } to any port 53
+</span><span>pass proto { TCP UDP } from { $prod_range $dev_range} to self port 53
 </span></code></pre>
 <p>Next, in order to perform NAT (to make this device an actual router), run the following:</p>
-<pre style="background-color:#2b303b;">
-<code><span style="color:#c0c5ce;">echo &#39;net.inet.ip.forwarding=1&#39; &gt;&gt; /etc/sysctl.conf
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>echo &#39;net.inet.ip.forwarding=1&#39; &gt;&gt; /etc/sysctl.conf
 </span></code></pre>
 <p>Finally, reboot with <code>reboot -p</code>. Now, the router is functional and secured with the pf firewall. At this point, it will work as a minimum viable product. However, every device on the network will need to manually configure its own static IP address, subnet mask, gateway, and DNS server (because there is no DHCP service running to supply these configuration details).</p>
 <h2 id="dhcp-dhcpd">DHCP (dhcpd)</h2>
@@ -390,33 +372,31 @@ pass proto { TCP UDP } from { $prod_range $dev_range} to self port 53
 <p>Most devices, upon joining the network, will be given an IP address from within a specified IP range. They could potentially receive any IP address in this range. However, I wanted some devices to be treated specially and always be given the same IP addresses by dhcpd. That way, I can rely on those devices to have predictable IP addresses. It is simpler and easier to define &quot;static&quot; IP addresses all in one place (on the router) rather than configure static IP addresses on each individual device. This way, every IP on my network is defined in one place, on the router. It will be obvious if two devices are configured to have the same static IP (a classic mistake).</p>
 <p>In addition to defining the IP address allocations in my network, I configured dhcpd to inform devices on my network of the preferred DNS server for the network, the router itself. We haven't set this up yet, but the router will also function as a caching DNS server.</p>
 <p>Here is an example /etc/dhcpd.conf file:</p>
-<pre style="background-color:#2b303b;">
-<code><span style="color:#c0c5ce;"># prod network
-subnet 192.168.1.0 netmask 255.255.255.0 {
-        option routers 192.168.1.1;
-        option domain-name-servers 192.168.1.1;
-        range 192.168.1.100 192.168.1.149;
-        host special-device-1 {
-                fixed-address 192.168.1.2;
-                hardware ethernet 00:00:00:00:00:00;
-        }
-}
-# dev network
-subnet 192.168.2.0 netmask 255.255.255.0 {
-        option routers 192.168.2.1;
-        option domain-name-servers 192.168.2.1;
-        range 192.168.2.100 192.168.2.199;
-        host special-device-2 {
-                fixed-address 192.168.2.2;
-                hardware ethernet 11:11:11:11:11:11;
-        }
-}
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span># prod network
+</span><span>subnet 192.168.1.0 netmask 255.255.255.0 {
+</span><span>        option routers 192.168.1.1;
+</span><span>        option domain-name-servers 192.168.1.1;
+</span><span>        range 192.168.1.100 192.168.1.149;
+</span><span>        host special-device-1 {
+</span><span>                fixed-address 192.168.1.2;
+</span><span>                hardware ethernet 00:00:00:00:00:00;
+</span><span>        }
+</span><span>}
+</span><span># dev network
+</span><span>subnet 192.168.2.0 netmask 255.255.255.0 {
+</span><span>        option routers 192.168.2.1;
+</span><span>        option domain-name-servers 192.168.2.1;
+</span><span>        range 192.168.2.100 192.168.2.199;
+</span><span>        host special-device-2 {
+</span><span>                fixed-address 192.168.2.2;
+</span><span>                hardware ethernet 11:11:11:11:11:11;
+</span><span>        }
+</span><span>}
 </span></code></pre>
 <p>This /etc/dhcpd.conf file configures the dhcpd server to hand out IP addresses for the dev and prod networks from within the specified ranges. In addition, it informs devices of the local DNS server (not yet configured). It also configures two &quot;special devices&quot; that will always be given the same IP addresses. dhcpd identifies these two devices by their MAC addresses. For more information check out the <a href="https://man.openbsd.org/dhcpd.conf.5">dhcpd.conf man page</a>.</p>
 <p>To enable dhcpd on the em1 and em2 interfaces, run:</p>
-<pre style="background-color:#2b303b;">
-<code><span style="color:#c0c5ce;">rcctl enable dhcpd
-rcctl set dhcpd flags em1 em2
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>rcctl enable dhcpd
+</span><span>rcctl set dhcpd flags em1 em2
 </span></code></pre>
 <p>Now, the DHCP server is running, automatically handing out IP addresses and network configuration details to new devices that join the network.</p>
 <h2 id="dns-unbound">DNS (unbound)</h2>
@@ -427,30 +407,28 @@ rcctl set dhcpd flags em1 em2
 <li>It is possible to configure custom DNS entries for the local network. The &quot;special devices&quot; configured in the DHCP server to always have the same IP addresses can be given DNS entries on the local network. For example, if I have a server running on my home network, I can give it a memorable DNS entry that will always resolve to its &quot;static&quot; IP address defined in the DHCP configuration.</li>
 </ol>
 <p>Here is an example unbound config file (located at /var/unbound/etc/unbound.conf):</p>
-<pre style="background-color:#2b303b;">
-<code><span style="color:#c0c5ce;">server:
-        interface: 127.0.0.1
-        interface: 192.168.1.1
-        interface: 192.168.2.1
-        access-control: 127.0.0.0/8 allow
-        access-control: 192.168.1.0/24 allow
-        access-control: 192.168.2.0/24 allow
-        hide-identity: yes
-        hide-version: yes
-        do-not-query-localhost: no
-        tls-cert-bundle: &quot;/etc/ssl/cert.pem&quot;
-        local-data: &quot;special-device-1.localdomain A 192.168.1.2&quot;
-        local-data: &quot;special-device-2.localdomain A 192.168.2.2&quot;
-
-forward-zone:
-        name: &quot;.&quot;
-        forward-tls-upstream: yes
-        forward-addr: 8.8.8.8@853
-        forward-addr: 8.8.4.4@853
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>server:
+</span><span>        interface: 127.0.0.1
+</span><span>        interface: 192.168.1.1
+</span><span>        interface: 192.168.2.1
+</span><span>        access-control: 127.0.0.0/8 allow
+</span><span>        access-control: 192.168.1.0/24 allow
+</span><span>        access-control: 192.168.2.0/24 allow
+</span><span>        hide-identity: yes
+</span><span>        hide-version: yes
+</span><span>        do-not-query-localhost: no
+</span><span>        tls-cert-bundle: &quot;/etc/ssl/cert.pem&quot;
+</span><span>        local-data: &quot;special-device-1.localdomain A 192.168.1.2&quot;
+</span><span>        local-data: &quot;special-device-2.localdomain A 192.168.2.2&quot;
+</span><span>
+</span><span>forward-zone:
+</span><span>        name: &quot;.&quot;
+</span><span>        forward-tls-upstream: yes
+</span><span>        forward-addr: 8.8.8.8@853
+</span><span>        forward-addr: 8.8.4.4@853
 </span></code></pre>
 <p>To enable the unbound DNS caching server, run:</p>
-<pre style="background-color:#2b303b;">
-<code><span style="color:#c0c5ce;">rcctl enable unbound
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>rcctl enable unbound
 </span></code></pre>
 <p>Now, the DNS caching server is running. Devices that join the network will automatically use this DNS server (unless otherwise configured) because the DHCP server will inform new devices that this is the preferred DNS server for the network. Also, by using this DNS server, the custom local DNS entries will resolve properly. For example, when any device on the local network makes a DNS lookup for <code>special-device-1.localdoman</code>, it resolves to 192.168.1.2. Lastly, all DNS lookups are cached by the unbound service. This will improve the latency of repeat DNS lookups.</p>
 <h2 id="conclusion">Conclusion</h2>

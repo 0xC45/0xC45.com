@@ -94,19 +94,18 @@
 <p>Because this blog is hosted on Github pages, <code>git push</code> is equivalent to publishing the site. Early on, I made the mistake of writing an entire blog post, but forgetting to &quot;generate&quot; the static site. So, I made a commit, pushed, and nothing happened.</p>
 <p>To prevent myself from making this mistake again, I added a &quot;pre-push&quot; hook to my git repo. Now, git will refuse to push if the generated static site is out of date.</p>
 <p>Here is my simple &quot;pre-push&quot; git hook:</p>
-<pre style="background-color:#2b303b;">
-<code><span style="color:#65737e;">#!/usr/bin/env bash
-
-</span><span style="color:#bf616a;">project_root</span><span style="color:#c0c5ce;">=&quot;$</span><span style="color:#a3be8c;">( </span><span style="color:#bf616a;">git</span><span style="color:#a3be8c;"> rev-parse</span><span style="color:#bf616a;"> --show-toplevel </span><span style="color:#a3be8c;">)</span><span style="color:#c0c5ce;">&quot;
-</span><span style="color:#bf616a;">pushd </span><span style="color:#c0c5ce;">&quot;$</span><span style="color:#a3be8c;">{</span><span style="color:#bf616a;">project_root</span><span style="color:#a3be8c;">}</span><span style="color:#c0c5ce;">&quot; &amp;&gt; /dev/null || </span><span style="color:#96b5b4;">exit</span><span style="color:#c0c5ce;"> 1
-</span><span style="color:#bf616a;">make </span><span style="color:#c0c5ce;">&amp;&gt; /dev/null
-</span><span style="color:#bf616a;">num_diff_files</span><span style="color:#c0c5ce;">=&quot;$</span><span style="color:#a3be8c;">( </span><span style="color:#bf616a;">git</span><span style="color:#a3be8c;"> diff</span><span style="color:#bf616a;"> --name-only </span><span style="color:#c0c5ce;">| </span><span style="color:#bf616a;">wc -l </span><span style="color:#a3be8c;">)</span><span style="color:#c0c5ce;">&quot;
-</span><span style="color:#bf616a;">num_untracked_files</span><span style="color:#c0c5ce;">=&quot;$</span><span style="color:#a3be8c;">( </span><span style="color:#bf616a;">git</span><span style="color:#a3be8c;"> ls-files</span><span style="color:#bf616a;"> --others --exclude-standard </span><span style="color:#c0c5ce;">| </span><span style="color:#bf616a;">wc -l </span><span style="color:#a3be8c;">)</span><span style="color:#c0c5ce;">&quot;
-</span><span style="color:#b48ead;">if </span><span style="color:#96b5b4;">[ </span><span style="color:#c0c5ce;">&quot;$</span><span style="color:#a3be8c;">{</span><span style="color:#bf616a;">num_diff_files</span><span style="color:#a3be8c;">}</span><span style="color:#c0c5ce;">&quot; != &quot;</span><span style="color:#a3be8c;">0</span><span style="color:#c0c5ce;">&quot; </span><span style="color:#96b5b4;">] </span><span style="color:#c0c5ce;">|| </span><span style="color:#96b5b4;">[ </span><span style="color:#c0c5ce;">&quot;$</span><span style="color:#a3be8c;">{</span><span style="color:#bf616a;">num_untracked_files</span><span style="color:#a3be8c;">}</span><span style="color:#c0c5ce;">&quot; != &quot;</span><span style="color:#a3be8c;">0</span><span style="color:#c0c5ce;">&quot; </span><span style="color:#96b5b4;">] </span><span style="color:#c0c5ce;">; </span><span style="color:#b48ead;">then
-  </span><span style="color:#96b5b4;">echo </span><span style="color:#c0c5ce;">&quot;</span><span style="color:#a3be8c;">diff detected after running </span><span style="color:#96b5b4;">\`</span><span style="color:#a3be8c;">make</span><span style="color:#96b5b4;">\`</span><span style="color:#a3be8c;">, not pushing</span><span style="color:#c0c5ce;">&quot;
-  </span><span style="color:#96b5b4;">exit</span><span style="color:#c0c5ce;"> 1
+<pre data-lang="bash" style="background-color:#2b303b;color:#c0c5ce;" class="language-bash "><code class="language-bash" data-lang="bash"><span style="color:#65737e;">#!/usr/bin/env bash
+</span><span>
+</span><span style="color:#bf616a;">project_root</span><span>=&quot;$</span><span style="color:#a3be8c;">( </span><span style="color:#bf616a;">git</span><span style="color:#a3be8c;"> rev-parse</span><span style="color:#bf616a;"> --show-toplevel </span><span style="color:#a3be8c;">)</span><span>&quot;
+</span><span style="color:#bf616a;">pushd </span><span>&quot;$</span><span style="color:#a3be8c;">{</span><span style="color:#bf616a;">project_root</span><span style="color:#a3be8c;">}</span><span>&quot; &amp;&gt; /dev/null || </span><span style="color:#96b5b4;">exit</span><span> 1
+</span><span style="color:#bf616a;">make </span><span>&amp;&gt; /dev/null
+</span><span style="color:#bf616a;">num_diff_files</span><span>=&quot;$</span><span style="color:#a3be8c;">( </span><span style="color:#bf616a;">git</span><span style="color:#a3be8c;"> diff</span><span style="color:#bf616a;"> --name-only </span><span>| </span><span style="color:#bf616a;">wc -l </span><span style="color:#a3be8c;">)</span><span>&quot;
+</span><span style="color:#bf616a;">num_untracked_files</span><span>=&quot;$</span><span style="color:#a3be8c;">( </span><span style="color:#bf616a;">git</span><span style="color:#a3be8c;"> ls-files</span><span style="color:#bf616a;"> --others --exclude-standard </span><span>| </span><span style="color:#bf616a;">wc -l </span><span style="color:#a3be8c;">)</span><span>&quot;
+</span><span style="color:#b48ead;">if </span><span style="color:#96b5b4;">[ </span><span>&quot;$</span><span style="color:#a3be8c;">{</span><span style="color:#bf616a;">num_diff_files</span><span style="color:#a3be8c;">}</span><span>&quot; != &quot;</span><span style="color:#a3be8c;">0</span><span>&quot; </span><span style="color:#96b5b4;">] </span><span>|| </span><span style="color:#96b5b4;">[ </span><span>&quot;$</span><span style="color:#a3be8c;">{</span><span style="color:#bf616a;">num_untracked_files</span><span style="color:#a3be8c;">}</span><span>&quot; != &quot;</span><span style="color:#a3be8c;">0</span><span>&quot; </span><span style="color:#96b5b4;">] </span><span>; </span><span style="color:#b48ead;">then
+</span><span>  </span><span style="color:#96b5b4;">echo </span><span>&quot;</span><span style="color:#a3be8c;">diff detected after running </span><span style="color:#96b5b4;">\`</span><span style="color:#a3be8c;">make</span><span style="color:#96b5b4;">\`</span><span style="color:#a3be8c;">, not pushing</span><span>&quot;
+</span><span>  </span><span style="color:#96b5b4;">exit</span><span> 1
 </span><span style="color:#b48ead;">fi
-</span><span style="color:#bf616a;">popd </span><span style="color:#c0c5ce;">&amp;&gt; /dev/null || </span><span style="color:#96b5b4;">exit</span><span style="color:#c0c5ce;"> 1
+</span><span style="color:#bf616a;">popd </span><span>&amp;&gt; /dev/null || </span><span style="color:#96b5b4;">exit</span><span> 1
 </span></code></pre>
 <p>In summary, this git hook builds the site (with Zola) and then checks if any git diff is detected. If there is a git diff (or new, un-tracked file), the hook will prevent the <code>git push</code> from running.</p>
 <p>As you might notice, this script depends on <code>make</code>. To build the website, I have a Makefile target (which will be discussed soon).</p>
@@ -115,33 +114,32 @@
 <p>Here is my Zola docker image: <a href="https://github.com/0xC45/zola-docker">https://github.com/0xC45/zola-docker</a>.</p>
 <h3 id="makefile">Makefile</h3>
 <p>Lastly, I use a Makefile to build the site. Because I use a docker image to run Zola, some of the commands are quite complicated. Particularly, it was somewhat difficult to set up UID/GID mapping and port binding. Using a Makefile documents the commands in code and saves me from having to remember them. Here is my Makefile:</p>
-<pre style="background-color:#2b303b;">
-<code><span style="color:#8fa1b3;">.PHONY</span><span style="color:#c0c5ce;">: all
-</span><span style="color:#8fa1b3;">all</span><span style="color:#c0c5ce;">:
-</span><span style="color:#bf616a;">	PROJECT_ROOT</span><span style="color:#c0c5ce;">=</span><span style="color:#a3be8c;">&quot;</span><span style="color:#b48ead;">$$(</span><span style="color:#bf616a;">git rev-parse --show-toplevel</span><span style="color:#b48ead;">)</span><span style="color:#a3be8c;">&quot; &amp;&amp; \
-	docker run \
-	  --rm \
-	  -it \
-	  -u </span><span style="color:#b48ead;">$$(</span><span style="color:#bf616a;">id -u </span><span style="color:#b48ead;">$${</span><span style="color:#bf616a;">USER</span><span style="color:#b48ead;">})</span><span style="color:#a3be8c;">:</span><span style="color:#b48ead;">$$(</span><span style="color:#bf616a;">id -g </span><span style="color:#b48ead;">$${</span><span style="color:#bf616a;">USER</span><span style="color:#b48ead;">}) </span><span style="color:#a3be8c;">\
-	  -v &quot;</span><span style="color:#b48ead;">$${</span><span style="color:#bf616a;">PROJECT_ROOT</span><span style="color:#b48ead;">}</span><span style="color:#a3be8c;">:/site&quot; \
-	  zola:v0.11.0 \
-	  bash -c &#39;cd /site &amp;&amp; zola build -o docs&#39;
-
-</span><span style="color:#8fa1b3;">.PHONY</span><span style="color:#c0c5ce;">: serve
-</span><span style="color:#8fa1b3;">serve</span><span style="color:#c0c5ce;">:
-</span><span style="color:#bf616a;">	PROJECT_ROOT</span><span style="color:#c0c5ce;">=</span><span style="color:#a3be8c;">&quot;</span><span style="color:#b48ead;">$$(</span><span style="color:#bf616a;">git rev-parse --show-toplevel</span><span style="color:#b48ead;">)</span><span style="color:#a3be8c;">&quot; &amp;&amp; \
-	docker run \
-	  --rm \
-	  -it \
-	  -u </span><span style="color:#b48ead;">$$(</span><span style="color:#bf616a;">id -u </span><span style="color:#b48ead;">$${</span><span style="color:#bf616a;">USER</span><span style="color:#b48ead;">})</span><span style="color:#a3be8c;">:</span><span style="color:#b48ead;">$$(</span><span style="color:#bf616a;">id -g </span><span style="color:#b48ead;">$${</span><span style="color:#bf616a;">USER</span><span style="color:#b48ead;">}) </span><span style="color:#a3be8c;">\
-	  -v &quot;</span><span style="color:#b48ead;">$${</span><span style="color:#bf616a;">PROJECT_ROOT</span><span style="color:#b48ead;">}</span><span style="color:#a3be8c;">:/site&quot; \
-	  -p 127.0.0.1:1111:1111 \
-	  zola:v0.11.0 \
-	  bash -c &#39;cd /site &amp;&amp; zola serve -i 0.0.0.0&#39;
-
-</span><span style="color:#8fa1b3;">.PHONY</span><span style="color:#c0c5ce;">: </span><span style="color:#a3be8c;">clean
-</span><span style="color:#8fa1b3;">clean</span><span style="color:#c0c5ce;">:
-	</span><span style="color:#a3be8c;">rm -rf docs/
+<pre data-lang="Makefile" style="background-color:#2b303b;color:#c0c5ce;" class="language-Makefile "><code class="language-Makefile" data-lang="Makefile"><span style="color:#8fa1b3;">.PHONY</span><span>: </span><span style="color:#a3be8c;">all
+</span><span style="color:#8fa1b3;">all</span><span>:
+</span><span>	</span><span style="color:#bf616a;">PROJECT_ROOT</span><span>=&quot;</span><span style="color:#b48ead;">$$(</span><span style="color:#bf616a;">git rev-parse --show-toplevel</span><span style="color:#b48ead;">)</span><span>&quot; &amp;&amp; \
+</span><span>	</span><span style="color:#bf616a;">docker</span><span> run \
+</span><span style="color:#bf616a;">	  --rm </span><span>\
+</span><span style="color:#bf616a;">	  -it </span><span>\
+</span><span style="color:#bf616a;">	  -u </span><span style="color:#b48ead;">$$(</span><span style="color:#bf616a;">id -u </span><span style="color:#b48ead;">$${</span><span style="color:#bf616a;">USER</span><span style="color:#b48ead;">})</span><span>:</span><span style="color:#b48ead;">$$(</span><span style="color:#bf616a;">id -g </span><span style="color:#b48ead;">$${</span><span style="color:#bf616a;">USER</span><span style="color:#b48ead;">}) </span><span>\
+</span><span style="color:#bf616a;">	  -v </span><span>&quot;</span><span style="color:#b48ead;">$${</span><span style="color:#bf616a;">PROJECT_ROOT</span><span style="color:#b48ead;">}</span><span style="color:#a3be8c;">:/site</span><span>&quot; \
+</span><span>	  zola:v0.11.0 \
+</span><span>	  bash</span><span style="color:#bf616a;"> -c </span><span>&#39;</span><span style="color:#a3be8c;">cd /site &amp;&amp; zola build -o docs</span><span>&#39;
+</span><span>
+</span><span style="color:#8fa1b3;">.PHONY</span><span>: </span><span style="color:#a3be8c;">serve
+</span><span style="color:#8fa1b3;">serve</span><span>:
+</span><span>	</span><span style="color:#bf616a;">PROJECT_ROOT</span><span>=&quot;</span><span style="color:#b48ead;">$$(</span><span style="color:#bf616a;">git rev-parse --show-toplevel</span><span style="color:#b48ead;">)</span><span>&quot; &amp;&amp; \
+</span><span>	</span><span style="color:#bf616a;">docker</span><span> run \
+</span><span style="color:#bf616a;">	  --rm </span><span>\
+</span><span style="color:#bf616a;">	  -it </span><span>\
+</span><span style="color:#bf616a;">	  -u </span><span style="color:#b48ead;">$$(</span><span style="color:#bf616a;">id -u </span><span style="color:#b48ead;">$${</span><span style="color:#bf616a;">USER</span><span style="color:#b48ead;">})</span><span>:</span><span style="color:#b48ead;">$$(</span><span style="color:#bf616a;">id -g </span><span style="color:#b48ead;">$${</span><span style="color:#bf616a;">USER</span><span style="color:#b48ead;">}) </span><span>\
+</span><span style="color:#bf616a;">	  -v </span><span>&quot;</span><span style="color:#b48ead;">$${</span><span style="color:#bf616a;">PROJECT_ROOT</span><span style="color:#b48ead;">}</span><span style="color:#a3be8c;">:/site</span><span>&quot; \
+</span><span style="color:#bf616a;">	  -p</span><span> 127.0.0.1:1111:1111 \
+</span><span>	  zola:v0.11.0 \
+</span><span>	  bash</span><span style="color:#bf616a;"> -c </span><span>&#39;</span><span style="color:#a3be8c;">cd /site &amp;&amp; zola serve -i 0.0.0.0</span><span>&#39;
+</span><span>
+</span><span style="color:#8fa1b3;">.PHONY</span><span>: </span><span style="color:#a3be8c;">clean
+</span><span style="color:#8fa1b3;">clean</span><span>:
+</span><span>	</span><span style="color:#bf616a;">rm -rf</span><span> docs/
 </span></code></pre>
 <p>There are three main targets: <code>all</code>, <code>serve</code>, and <code>clean</code>.</p>
 <ul>

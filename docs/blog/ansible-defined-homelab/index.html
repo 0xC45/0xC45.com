@@ -97,7 +97,7 @@
 <h2 id="overview">Overview</h2>
 <p>Around November of last year, I started a project to wrangle my digital life. Tired of haphazardly increasing my subjectivity by trusting &quot;free&quot; websites to provide various services, I wanted to wrest some control over my internet existence. I made a plan to self-host several &quot;critical&quot; services on my home network and maintain them personally. In short, I made a homelab.</p>
 <p>To be frank, the professional websites that I was previously dependent upon are undoubtedly more reliable than my cobbled-together hobby project of a homelab. However, on general principle (and because it seemed like a fun way to learn some sysadmin / devops skills), I made this setup:</p>
-<p><img src="https://0xC45.com/blog/ansible-defined-homelab/homelab-network-diagram.svg" alt="Homelab Network Diagram" /></p>
+<p><img src="homelab-network-diagram.svg" alt="Homelab Network Diagram" /></p>
 <p>As you can see, I have deployed a couple of general-purpose compute platforms: 4 ESXi hypervisors, and a Kubernetes cluster. Additionally, there are several VM-based services: Nextcloud, Gitea, and Harbor. For data storage and backup, I use a Synology NAS. Finally, a custom OpenBSD-based router provides internet connectivity to everything. In order to reduce operational overhead, I crafted <a href="https://github.com/0xC45/homelab-setup">a set of Ansible scripts</a> that deploy and configure all of these components.</p>
 <p>Overall, making this setup has been quite a journey. In this blog post, I will describe my uses for each of these services, share my thoughts and experiences so far, and attempt to articulate my future improvement plans.</p>
 <h2 id="motivation">Motivation</h2>
