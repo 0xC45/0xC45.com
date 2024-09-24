@@ -78,9 +78,9 @@
 <h2 id="overview">Overview</h2>
 <p>To build this website, I use the <a href="https://www.getzola.org/">Zola static site engine</a>. So far, it has worked great. In this blog post, I will discuss my workflow improvements for using Zola, developing my blog posts, and publishing this website. As a quick intro, however, I will give a brief summary of the main features of Zola and why I chose to use it.</p>
 <h3 id="what-is-zola">What is Zola?</h3>
-<p>Zola advertises itself as a static site engine. It &quot;compiles&quot; Markdown content files, HTML templates (based on the <a href="https://tera.netlify.app/">Tera template engine</a>), and <a href="https://sass-lang.com/">Sass</a> styling into static HTML and CSS pages. This way, a Zola website does not require any server-side code to &quot;render&quot; the website pages.</p>
+<p>Zola advertises itself as a static site engine. It "compiles" Markdown content files, HTML templates (based on the <a href="https://tera.netlify.app/">Tera template engine</a>), and <a href="https://sass-lang.com/">Sass</a> styling into static HTML and CSS pages. This way, a Zola website does not require any server-side code to "render" the website pages.</p>
 <p>In addition, Zola has several convenience features that one would want for a blog or website, such as built-in <a href="https://www.getzola.org/documentation/content/syntax-highlighting/">syntax highlighting</a>, simplified <a href="https://www.getzola.org/documentation/templates/pagination/">pagination</a>, and auto-generation of <a href="https://www.getzola.org/documentation/templates/feeds/">atom/rss feeds</a>.</p>
-<p>So, Zola is an all-in-one tool for generating static websites. As a blog author, I can mainly focus on writing my blog post content (in Markdown). I don't have to worry too much about HTML syntax, CSS styling, linking, pagination, or my Atom feed (after the initial setup and creation of my site theme). When I'm done writing a blog post, I &quot;generate&quot; the static site with Zola. All of the repetitive and error-prone work is handled for me and the actual static website pages are produced.</p>
+<p>So, Zola is an all-in-one tool for generating static websites. As a blog author, I can mainly focus on writing my blog post content (in Markdown). I don't have to worry too much about HTML syntax, CSS styling, linking, pagination, or my Atom feed (after the initial setup and creation of my site theme). When I'm done writing a blog post, I "generate" the static site with Zola. All of the repetitive and error-prone work is handled for me and the actual static website pages are produced.</p>
 <h3 id="why-use-zola">Why use Zola?</h3>
 <p>There are many competing static site generators out there. Zola is but one of many. Currently, Hugo and Jekyll are probably the two most popular static site generators. However, for this website, I chose to use Zola for a few reasons:</p>
 <ul>
@@ -89,11 +89,11 @@
 <li>It's a relatively new project. Why not give it a try?</li>
 </ul>
 <h2 id="my-zola-workflow">My Zola Workflow</h2>
-<p>Rather than repeat stuff you can find in the Zola documentation, in this blog post I will cover three of my personal &quot;workflow hacks&quot; for working with Zola. Hopefully at least a couple of these patterns are useful to you.</p>
+<p>Rather than repeat stuff you can find in the Zola documentation, in this blog post I will cover three of my personal "workflow hacks" for working with Zola. Hopefully at least a couple of these patterns are useful to you.</p>
 <h3 id="git-pre-push-hook">Git pre-push Hook</h3>
-<p>Because this blog is hosted on Github pages, <code>git push</code> is equivalent to publishing the site. Early on, I made the mistake of writing an entire blog post, but forgetting to &quot;generate&quot; the static site. So, I made a commit, pushed, and nothing happened.</p>
-<p>To prevent myself from making this mistake again, I added a &quot;pre-push&quot; hook to my git repo. Now, git will refuse to push if the generated static site is out of date.</p>
-<p>Here is my simple &quot;pre-push&quot; git hook:</p>
+<p>Because this blog is hosted on Github pages, <code>git push</code> is equivalent to publishing the site. Early on, I made the mistake of writing an entire blog post, but forgetting to "generate" the static site. So, I made a commit, pushed, and nothing happened.</p>
+<p>To prevent myself from making this mistake again, I added a "pre-push" hook to my git repo. Now, git will refuse to push if the generated static site is out of date.</p>
+<p>Here is my simple "pre-push" git hook:</p>
 <pre data-lang="bash" style="background-color:#2b303b;color:#c0c5ce;" class="language-bash "><code class="language-bash" data-lang="bash"><span style="color:#65737e;">#!/usr/bin/env bash
 </span><span>
 </span><span style="color:#bf616a;">project_root</span><span>=&quot;$</span><span style="color:#a3be8c;">( </span><span style="color:#bf616a;">git</span><span style="color:#a3be8c;"> rev-parse</span><span style="color:#bf616a;"> --show-toplevel </span><span style="color:#a3be8c;">)</span><span>&quot;
@@ -144,7 +144,7 @@
 <p>There are three main targets: <code>all</code>, <code>serve</code>, and <code>clean</code>.</p>
 <ul>
 <li><code>all</code>: This target generates the static site.</li>
-<li><code>serve</code>: This target runs a &quot;development&quot; server on my local machine, allowing me to preview changes.</li>
+<li><code>serve</code>: This target runs a "development" server on my local machine, allowing me to preview changes.</li>
 <li><code>clean</code>: This target deletes the directory containing the generated static site.</li>
 </ul>
 <h2 id="conclusion">Conclusion</h2>

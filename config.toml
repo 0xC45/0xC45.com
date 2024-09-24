@@ -1,12 +1,10 @@
 base_url = "https://0xC45.com"
 title = "0xC45"
 description = "0xC45 blog"
+author = "Jason Vigil"
 compile_sass = true
-generate_feed = true
+generate_feeds = true
 
 [markdown]
 highlight_code = true
 highlight_theme = "base16-ocean-dark"
-
-[extra]
-author = "Jason Vigil"

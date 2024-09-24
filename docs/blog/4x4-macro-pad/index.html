@@ -63,13 +63,13 @@
     </ul>
     <section>
 <h2 id="overview">Overview</h2>
-<p>Last weekend, I built a 4x4 keyboard kit. By this point, many people are familiar with the growing (and outspoken) mechanical keyboard hobbyist community. However, this kit is a bit unique. It's not a full keyboard. Instead, it's a 4x4 &quot;macro pad&quot; intended for sending keyboard shortcut sequences such as muting my microphone, muting my audio, volume up, volume down, etc. Additionally, with some extra software such as AutoHotKey, vastly complex programs could be triggered with the press of a button.</p>
+<p>Last weekend, I built a 4x4 keyboard kit. By this point, many people are familiar with the growing (and outspoken) mechanical keyboard hobbyist community. However, this kit is a bit unique. It's not a full keyboard. Instead, it's a 4x4 "macro pad" intended for sending keyboard shortcut sequences such as muting my microphone, muting my audio, volume up, volume down, etc. Additionally, with some extra software such as AutoHotKey, vastly complex programs could be triggered with the press of a button.</p>
 <h2 id="build-process">Build Process</h2>
-<p>Overall, building the macro pad was a simple and straightforward process. The <a href="https://www.1upkeyboards.com/instructions-downloads/sweet-16-instructions/">kit's build guide</a> provides a nice set of instructions with pictures to explain things. However, unlike many (some?) keyboard kits, the Sweet 16 kit requires soldering a few smaller components, such as the diodes and microcontroller headers. Additionally, the kit requires soldering one &quot;surface-mount&quot; component, the reset switch.</p>
+<p>Overall, building the macro pad was a simple and straightforward process. The <a href="https://www.1upkeyboards.com/instructions-downloads/sweet-16-instructions/">kit's build guide</a> provides a nice set of instructions with pictures to explain things. However, unlike many (some?) keyboard kits, the Sweet 16 kit requires soldering a few smaller components, such as the diodes and microcontroller headers. Additionally, the kit requires soldering one "surface-mount" component, the reset switch.</p>
 <p>The parts:
-<img src="sweet16-parts.jpg" alt="Sweet16 Parts" /></p>
+<img src="https://0xC45.com/blog/4x4-macro-pad/sweet16-parts.jpg" alt="Sweet16 Parts" /></p>
 <p>Completed build:
-<img src="sweet16-solder-joints.jpg" alt="Sweet16 Solder Joints" /></p>
+<img src="https://0xC45.com/blog/4x4-macro-pad/sweet16-solder-joints.jpg" alt="Sweet16 Solder Joints" /></p>
 <h2 id="flash-firmware">Flash Firmware</h2>
 <p>To program my custom keymap (including multiple keypress macros), I used <a href="https://qmk.fm/">QMK firmware</a>, the most popular keyboard firmware project.</p>
 <p>Using QMK, it's possible to create custom keycodes that, when pressed, trigger a sequence of inputs. So, by pressing one button on the macro pad (or keyboard), the firmware will submit an entire sequence of keycode presses.</p>
@@ -86,7 +86,7 @@
 </span><span>  MACRO8
 </span><span>};
 </span></code></pre>
-<p>Next, I defined a &quot;keymap&quot; array. Each position in the array corresponds to a single button on the 4x4 macro pad:</p>
+<p>Next, I defined a "keymap" array. Each position in the array corresponds to a single button on the 4x4 macro pad:</p>
 <pre data-lang="c" style="background-color:#2b303b;color:#c0c5ce;" class="language-c "><code class="language-c" data-lang="c"><span style="color:#b48ead;">const </span><span>uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 </span><span>  [</span><span style="color:#d08770;">0</span><span>] = </span><span style="color:#bf616a;">LAYOUT_ortho_4x4</span><span>( </span><span style="color:#65737e;">/* Base */
 </span><span>    MICMUTE, KC_MUTE, KC_VOLD, KC_VOLU,
@@ -118,10 +118,10 @@
 </span></code></pre>
 <p>As you can see, I have configured the <code>MICMUTE</code> button to send the entire sequence <code>CTRL+ALT+SHIFT+F10</code>. However, in practice, any arbitrary sequence could be sent for any button. And, that's only beginning to scratch the surface of the capabilities of the QMK firmware.</p>
 <h2 id="design-keycaps">Design Keycaps</h2>
-<p>For this &quot;DIY&quot; kit, it felt important to design my own icons. I'm no graphic designer, but it was kinda fun. To do this, I used &quot;re-legendable&quot; keycaps that snap together with a clear top. Then, I printed the icons on plain white paper, cut them out, and sandwiched each icon in the keycaps. Here's a photo of my efforts:</p>
-<p><img src="sweet16-completed.jpg" alt="Sweet16 Completed" /></p>
+<p>For this "DIY" kit, it felt important to design my own icons. I'm no graphic designer, but it was kinda fun. To do this, I used "re-legendable" keycaps that snap together with a clear top. Then, I printed the icons on plain white paper, cut them out, and sandwiched each icon in the keycaps. Here's a photo of my efforts:</p>
+<p><img src="https://0xC45.com/blog/4x4-macro-pad/sweet16-completed.jpg" alt="Sweet16 Completed" /></p>
 <h2 id="conclusion">Conclusion</h2>
-<p>This was a pretty quick project, but I felt like it deserved a writeup nevertheless. As a relative beginner at soldering, this kit was a fantastic way to increase my skills and ability beyond the &quot;absolute beginner&quot; level required for most keyboard kits. Furthermore, the final product is quite useful and extensible. Beyond the specific purpose as a simple macro pad keyboard, this hardware is essentially a microcontroller connected to a set of buttons. There are numerous possible applications. It's ripe for hacking. This device could become a MIDI controller, home automation remote, or anything else my imagination might dream up. Until next time.</p>
+<p>This was a pretty quick project, but I felt like it deserved a writeup nevertheless. As a relative beginner at soldering, this kit was a fantastic way to increase my skills and ability beyond the "absolute beginner" level required for most keyboard kits. Furthermore, the final product is quite useful and extensible. Beyond the specific purpose as a simple macro pad keyboard, this hardware is essentially a microcontroller connected to a set of buttons. There are numerous possible applications. It's ripe for hacking. This device could become a MIDI controller, home automation remote, or anything else my imagination might dream up. Until next time.</p>
 <h2 id="links">Links</h2>
 <ol>
 <li>Sweeet 16 Macro Pad Kit: <a href="https://www.1upkeyboards.com/shop/keyboard-kits/macro-pads/sweet-16-macro-pad-black/">https://www.1upkeyboards.com/shop/keyboard-kits/macro-pads/sweet-16-macro-pad-black/</a></li>

@@ -1,36 +1,46 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en">
-	<title>0xC45</title>
-	<subtitle>0xC45 blog</subtitle>
-	<link href="https://0xC45.com/atom.xml" rel="self" type="application/atom+xml"/>
-  <link href="https://0xC45.com"/>
-	<generator uri="https://www.getzola.org/">Zola</generator>
-	<updated>2022-01-09T00:00:00+00:00</updated>
-	<id>https://0xC45.com/atom.xml</id>
-	<entry xml:lang="en">
-		<title>Digital Audio Synthesizer in Rust</title>
-		<published>2022-01-09T00:00:00+00:00</published>
-		<updated>2022-01-09T00:00:00+00:00</updated>
-		<link href="https://0xC45.com/blog/digital-audio-synthesizer-in-rust/" type="text/html"/>
-		<id>https://0xC45.com/blog/digital-audio-synthesizer-in-rust/</id>
-		<content type="html">&lt;h2 id=&quot;overview&quot;&gt;Overview&lt;&#x2F;h2&gt;
+    <title>0xC45</title>
+    <subtitle>0xC45 blog</subtitle>
+    <link rel="self" type="application/atom+xml" href="https://0xC45.com/atom.xml"/>
+    <link rel="alternate" type="text/html" href="https://0xC45.com"/>
+    <generator uri="https://www.getzola.org/">Zola</generator>
+    <updated>2022-01-09T00:00:00+00:00</updated>
+    <id>https://0xC45.com/atom.xml</id>
+    <entry xml:lang="en">
+        <title>Digital Audio Synthesizer in Rust</title>
+        <published>2022-01-09T00:00:00+00:00</published>
+        <updated>2022-01-09T00:00:00+00:00</updated>
+        
+        <author>
+          <name>
+            
+              Jason Vigil
+            
+          </name>
+        </author>
+        
+        <link rel="alternate" type="text/html" href="https://0xC45.com/blog/digital-audio-synthesizer-in-rust/"/>
+        <id>https://0xC45.com/blog/digital-audio-synthesizer-in-rust/</id>
+        
+        <content type="html" xml:base="https://0xC45.com/blog/digital-audio-synthesizer-in-rust/">&lt;h2 id=&quot;overview&quot;&gt;Overview&lt;&#x2F;h2&gt;
 &lt;p&gt;Over the past couple weekends, I built a digital audio synthesizer in rust. It is controlled via the keyboard, with the bottom two rows emulating piano keys. Since there are fewer keyboard buttons than piano keys, you can specify which octave to play via a command line argument. For some extra fun, you can also specify which waveform to synthesize (sine, square, triangle, or sawtooth). Lastly, it is polyphonic, meaning it supports playing multiple notes at the same time (keyboard hardware &#x2F; firmware permitting). &lt;a href=&quot;https:&#x2F;&#x2F;github.com&#x2F;0xC45&#x2F;simple-synth&quot;&gt;Here&lt;&#x2F;a&gt; is a link to the code.&lt;&#x2F;p&gt;
 &lt;h2 id=&quot;how-does-it-work&quot;&gt;How Does it Work?&lt;&#x2F;h2&gt;
 &lt;p&gt;In theory, digital audio synthesis is fairly straightforward. To create sound, send a series of digital values to the sound card that represent the relative position of the speaker cone at each instant in time. These digital values are converted to analog electric signals by the sound card, which get transformed into sounds via the motion of the speaker cone.&lt;&#x2F;p&gt;
-&lt;p&gt;&lt;img src=&quot;digital-audio-synthesis.png&quot; alt=&quot;Digital audio synthesis&quot; &#x2F;&gt;&lt;&#x2F;p&gt;
-&lt;p&gt;This simple synthesizer is able to generate 4 distinct types of sounds (waveforms) by oscillating the speaker(s) in different ways. It receives button press events from the keyboard, determines what frequency (or &amp;quot;note&amp;quot;) that key represents, then computes a waveform that oscillates at the desired frequency.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;img src=&quot;https:&#x2F;&#x2F;0xC45.com&#x2F;blog&#x2F;digital-audio-synthesizer-in-rust&#x2F;digital-audio-synthesis.png&quot; alt=&quot;Digital audio synthesis&quot; &#x2F;&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;This simple synthesizer is able to generate 4 distinct types of sounds (waveforms) by oscillating the speaker(s) in different ways. It receives button press events from the keyboard, determines what frequency (or &quot;note&quot;) that key represents, then computes a waveform that oscillates at the desired frequency.&lt;&#x2F;p&gt;
 &lt;p&gt;On startup, the program launches two threads: graphics and audio.&lt;&#x2F;p&gt;
 &lt;h3 id=&quot;graphics&quot;&gt;Graphics&lt;&#x2F;h3&gt;
-&lt;p&gt;Currently, the only job of the graphics thread is to create a window for the program, receive keyboard events, translate keyboard events to &amp;quot;midi&amp;quot; note on &#x2F; off events, and send the midi events to the audio thread. It does not yet display a useful GUI for the synthesizer.&lt;&#x2F;p&gt;
-&lt;p&gt;&lt;img src=&quot;blank-gui-window.png&quot; alt=&quot;Blank GUI window&quot; &#x2F;&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;Currently, the only job of the graphics thread is to create a window for the program, receive keyboard events, translate keyboard events to &quot;midi&quot; note on &#x2F; off events, and send the midi events to the audio thread. It does not yet display a useful GUI for the synthesizer.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;img src=&quot;https:&#x2F;&#x2F;0xC45.com&#x2F;blog&#x2F;digital-audio-synthesizer-in-rust&#x2F;blank-gui-window.png&quot; alt=&quot;Blank GUI window&quot; &#x2F;&gt;&lt;&#x2F;p&gt;
 &lt;p&gt;To draw the window and collect keyboard events, I decided to use the &lt;a href=&quot;https:&#x2F;&#x2F;crates.io&#x2F;crates&#x2F;piston&quot;&gt;piston&lt;&#x2F;a&gt; game engine library. This is a popular library that abstracts a bunch of the platform-specific details away. It should be easy to use this library to eventually make a useful UI.&lt;&#x2F;p&gt;
 &lt;p&gt;To send note on &#x2F; off events to the audio thread, I employed the &lt;a href=&quot;https:&#x2F;&#x2F;crates.io&#x2F;crates&#x2F;crossbeam&quot;&gt;crossbeam&lt;&#x2F;a&gt; library&#x27;s bounded channel. This is far from an optimal solution. Production quality audio engines utilize lock-free data structures (such as lock-free circular queues), self-managed heaps, and atomic data access. See &lt;a href=&quot;https:&#x2F;&#x2F;www.youtube.com&#x2F;watch?v=boPEO2auJj4&quot;&gt;this video&lt;&#x2F;a&gt; for a good overview of these concepts. Real-time guarantees would be a good area of future exploration to improve this synthesizer and my general rust language knowledge.&lt;&#x2F;p&gt;
 &lt;h3 id=&quot;audio&quot;&gt;Audio&lt;&#x2F;h3&gt;
 &lt;p&gt;The majority of the work for this program is done in the audio thread. To generate sound, I use &lt;a href=&quot;https:&#x2F;&#x2F;crates.io&#x2F;crates&#x2F;cpal&quot;&gt;CPAL&lt;&#x2F;a&gt;, a cross-platform audio library for Rust. The API this library provides was a bit bizarre to me at first. However, after doing some more research about audio programming, it seems to be the standard way of interacting with sound cards.&lt;&#x2F;p&gt;
 &lt;p&gt;As a user of CPAL, you provide a callback function (closure, actually). On regular intervals, the audio callback function is run, which must fill in the next chunk of digital audio values. For each note that is currently being played, the synthesizer generates values that correspond to a waveform. For example, here is a plot of a simple sine wave that was generated by this synth (plotted with gnu octave):&lt;&#x2F;p&gt;
-&lt;p&gt;&lt;img src=&quot;sine-wave.png&quot; alt=&quot;Sine wave&quot; &#x2F;&gt;&lt;&#x2F;p&gt;
-&lt;p&gt;To play this sound, the audio loop computes all of the &amp;quot;y&amp;quot; values for this waveform and dumps them into the audio buffer. To support polyphony (playing multiple notes at once), all of the values for each of the notes are added together. The resulting waveform may be quite complex. For example, here is the waveform of a simple 3-note chord (triad).&lt;&#x2F;p&gt;
-&lt;p&gt;&lt;img src=&quot;polyphonic-sine-wave.png&quot; alt=&quot;Polyphonic sine wave&quot; &#x2F;&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;img src=&quot;https:&#x2F;&#x2F;0xC45.com&#x2F;blog&#x2F;digital-audio-synthesizer-in-rust&#x2F;sine-wave.png&quot; alt=&quot;Sine wave&quot; &#x2F;&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;To play this sound, the audio loop computes all of the &quot;y&quot; values for this waveform and dumps them into the audio buffer. To support polyphony (playing multiple notes at once), all of the values for each of the notes are added together. The resulting waveform may be quite complex. For example, here is the waveform of a simple 3-note chord (triad).&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;img src=&quot;https:&#x2F;&#x2F;0xC45.com&#x2F;blog&#x2F;digital-audio-synthesizer-in-rust&#x2F;polyphonic-sine-wave.png&quot; alt=&quot;Polyphonic sine wave&quot; &#x2F;&gt;&lt;&#x2F;p&gt;
 &lt;p&gt;Here is the core loop that computes and generates the various waveforms:&lt;&#x2F;p&gt;
 &lt;pre data-lang=&quot;rust&quot; style=&quot;background-color:#2b303b;color:#c0c5ce;&quot; class=&quot;language-rust &quot;&gt;&lt;code class=&quot;language-rust&quot; data-lang=&quot;rust&quot;&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;let mut&lt;&#x2F;span&gt;&lt;span&gt; value = &lt;&#x2F;span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;0_&lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;f32&lt;&#x2F;span&gt;&lt;span&gt;;
 &lt;&#x2F;span&gt;&lt;span&gt;
@@ -61,7 +71,7 @@
 &lt;&#x2F;span&gt;&lt;span&gt;
 &lt;&#x2F;span&gt;&lt;span&gt;value
 &lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
-&lt;p&gt;For each note, the internal &amp;quot;clock&amp;quot; is incremented. This is the x axis for the graphs above. Then, based on the required waveform, the next y value is computed. All of the values are scaled based on some modifier (to reduce volume and allow multiple notes to be played at once). Each note&#x27;s value is added to produce the final value for the instant.&lt;&#x2F;p&gt;
+&lt;p&gt;For each note, the internal &quot;clock&quot; is incremented. This is the x axis for the graphs above. Then, based on the required waveform, the next y value is computed. All of the values are scaled based on some modifier (to reduce volume and allow multiple notes to be played at once). Each note&#x27;s value is added to produce the final value for the instant.&lt;&#x2F;p&gt;
 &lt;p&gt;Based on a typical sample rate of 44.1 kHz, this loop must run 44,100 times a second. Therefore, it&#x27;s essential to ensure that the audio callback function is highly efficient and maintains predictable runtimes. Otherwise, the audio stream will drop and there will be noticable clicks &#x2F; pops in the sound.&lt;&#x2F;p&gt;
 &lt;h2 id=&quot;next-steps&quot;&gt;Next Steps&lt;&#x2F;h2&gt;
 &lt;p&gt;There are many ways that I plan to improve this synthesizer:&lt;&#x2F;p&gt;
@@ -76,7 +86,7 @@
 &lt;&#x2F;li&gt;
 &lt;li&gt;
 &lt;p&gt;Add configurable envelope&lt;&#x2F;p&gt;
-&lt;p&gt;To make more interesting sounds, I want to add configurable &amp;quot;envelopes&amp;quot; for the notes. The envelope is the relative amplitude (or volume) of the waveform over time. For example, a piano key is loud initially, then fades slowly.&lt;&#x2F;p&gt;
+&lt;p&gt;To make more interesting sounds, I want to add configurable &quot;envelopes&quot; for the notes. The envelope is the relative amplitude (or volume) of the waveform over time. For example, a piano key is loud initially, then fades slowly.&lt;&#x2F;p&gt;
 &lt;&#x2F;li&gt;
 &lt;li&gt;
 &lt;p&gt;Ecosystem integration&lt;&#x2F;p&gt;
@@ -101,21 +111,32 @@
 &lt;li&gt;Code-It-Yourself! Sound Synthesizer #1 - Basic Noises: &lt;a href=&quot;https:&#x2F;&#x2F;www.youtube.com&#x2F;watch?v=tgamhuQnOkM&quot;&gt;https:&#x2F;&#x2F;www.youtube.com&#x2F;watch?v=tgamhuQnOkM&lt;&#x2F;a&gt;&lt;&#x2F;li&gt;
 &lt;&#x2F;ul&gt;
 </content>
-	</entry>
-	<entry xml:lang="en">
-		<title>4x4 Macro Pad</title>
-		<published>2020-10-06T00:00:00+00:00</published>
-		<updated>2020-10-06T00:00:00+00:00</updated>
-		<link href="https://0xC45.com/blog/4x4-macro-pad/" type="text/html"/>
-		<id>https://0xC45.com/blog/4x4-macro-pad/</id>
-		<content type="html">&lt;h2 id=&quot;overview&quot;&gt;Overview&lt;&#x2F;h2&gt;
-&lt;p&gt;Last weekend, I built a 4x4 keyboard kit. By this point, many people are familiar with the growing (and outspoken) mechanical keyboard hobbyist community. However, this kit is a bit unique. It&#x27;s not a full keyboard. Instead, it&#x27;s a 4x4 &amp;quot;macro pad&amp;quot; intended for sending keyboard shortcut sequences such as muting my microphone, muting my audio, volume up, volume down, etc. Additionally, with some extra software such as AutoHotKey, vastly complex programs could be triggered with the press of a button.&lt;&#x2F;p&gt;
+        
+    </entry>
+    <entry xml:lang="en">
+        <title>4x4 Macro Pad</title>
+        <published>2020-10-06T00:00:00+00:00</published>
+        <updated>2020-10-06T00:00:00+00:00</updated>
+        
+        <author>
+          <name>
+            
+              Jason Vigil
+            
+          </name>
+        </author>
+        
+        <link rel="alternate" type="text/html" href="https://0xC45.com/blog/4x4-macro-pad/"/>
+        <id>https://0xC45.com/blog/4x4-macro-pad/</id>
+        
+        <content type="html" xml:base="https://0xC45.com/blog/4x4-macro-pad/">&lt;h2 id=&quot;overview&quot;&gt;Overview&lt;&#x2F;h2&gt;
+&lt;p&gt;Last weekend, I built a 4x4 keyboard kit. By this point, many people are familiar with the growing (and outspoken) mechanical keyboard hobbyist community. However, this kit is a bit unique. It&#x27;s not a full keyboard. Instead, it&#x27;s a 4x4 &quot;macro pad&quot; intended for sending keyboard shortcut sequences such as muting my microphone, muting my audio, volume up, volume down, etc. Additionally, with some extra software such as AutoHotKey, vastly complex programs could be triggered with the press of a button.&lt;&#x2F;p&gt;
 &lt;h2 id=&quot;build-process&quot;&gt;Build Process&lt;&#x2F;h2&gt;
-&lt;p&gt;Overall, building the macro pad was a simple and straightforward process. The &lt;a href=&quot;https:&#x2F;&#x2F;www.1upkeyboards.com&#x2F;instructions-downloads&#x2F;sweet-16-instructions&#x2F;&quot;&gt;kit&#x27;s build guide&lt;&#x2F;a&gt; provides a nice set of instructions with pictures to explain things. However, unlike many (some?) keyboard kits, the Sweet 16 kit requires soldering a few smaller components, such as the diodes and microcontroller headers. Additionally, the kit requires soldering one &amp;quot;surface-mount&amp;quot; component, the reset switch.&lt;&#x2F;p&gt;
+&lt;p&gt;Overall, building the macro pad was a simple and straightforward process. The &lt;a href=&quot;https:&#x2F;&#x2F;www.1upkeyboards.com&#x2F;instructions-downloads&#x2F;sweet-16-instructions&#x2F;&quot;&gt;kit&#x27;s build guide&lt;&#x2F;a&gt; provides a nice set of instructions with pictures to explain things. However, unlike many (some?) keyboard kits, the Sweet 16 kit requires soldering a few smaller components, such as the diodes and microcontroller headers. Additionally, the kit requires soldering one &quot;surface-mount&quot; component, the reset switch.&lt;&#x2F;p&gt;
 &lt;p&gt;The parts:
-&lt;img src=&quot;sweet16-parts.jpg&quot; alt=&quot;Sweet16 Parts&quot; &#x2F;&gt;&lt;&#x2F;p&gt;
+&lt;img src=&quot;https:&#x2F;&#x2F;0xC45.com&#x2F;blog&#x2F;4x4-macro-pad&#x2F;sweet16-parts.jpg&quot; alt=&quot;Sweet16 Parts&quot; &#x2F;&gt;&lt;&#x2F;p&gt;
 &lt;p&gt;Completed build:
-&lt;img src=&quot;sweet16-solder-joints.jpg&quot; alt=&quot;Sweet16 Solder Joints&quot; &#x2F;&gt;&lt;&#x2F;p&gt;
+&lt;img src=&quot;https:&#x2F;&#x2F;0xC45.com&#x2F;blog&#x2F;4x4-macro-pad&#x2F;sweet16-solder-joints.jpg&quot; alt=&quot;Sweet16 Solder Joints&quot; &#x2F;&gt;&lt;&#x2F;p&gt;
 &lt;h2 id=&quot;flash-firmware&quot;&gt;Flash Firmware&lt;&#x2F;h2&gt;
 &lt;p&gt;To program my custom keymap (including multiple keypress macros), I used &lt;a href=&quot;https:&#x2F;&#x2F;qmk.fm&#x2F;&quot;&gt;QMK firmware&lt;&#x2F;a&gt;, the most popular keyboard firmware project.&lt;&#x2F;p&gt;
 &lt;p&gt;Using QMK, it&#x27;s possible to create custom keycodes that, when pressed, trigger a sequence of inputs. So, by pressing one button on the macro pad (or keyboard), the firmware will submit an entire sequence of keycode presses.&lt;&#x2F;p&gt;
@@ -132,7 +153,7 @@
 &lt;&#x2F;span&gt;&lt;span&gt;  MACRO8
 &lt;&#x2F;span&gt;&lt;span&gt;};
 &lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
-&lt;p&gt;Next, I defined a &amp;quot;keymap&amp;quot; array. Each position in the array corresponds to a single button on the 4x4 macro pad:&lt;&#x2F;p&gt;
+&lt;p&gt;Next, I defined a &quot;keymap&quot; array. Each position in the array corresponds to a single button on the 4x4 macro pad:&lt;&#x2F;p&gt;
 &lt;pre data-lang=&quot;c&quot; style=&quot;background-color:#2b303b;color:#c0c5ce;&quot; class=&quot;language-c &quot;&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;const &lt;&#x2F;span&gt;&lt;span&gt;uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 &lt;&#x2F;span&gt;&lt;span&gt;  [&lt;&#x2F;span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;0&lt;&#x2F;span&gt;&lt;span&gt;] = &lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;LAYOUT_ortho_4x4&lt;&#x2F;span&gt;&lt;span&gt;( &lt;&#x2F;span&gt;&lt;span style=&quot;color:#65737e;&quot;&gt;&#x2F;* Base *&#x2F;
 &lt;&#x2F;span&gt;&lt;span&gt;    MICMUTE, KC_MUTE, KC_VOLD, KC_VOLU,
@@ -164,10 +185,10 @@
 &lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
 &lt;p&gt;As you can see, I have configured the &lt;code&gt;MICMUTE&lt;&#x2F;code&gt; button to send the entire sequence &lt;code&gt;CTRL+ALT+SHIFT+F10&lt;&#x2F;code&gt;. However, in practice, any arbitrary sequence could be sent for any button. And, that&#x27;s only beginning to scratch the surface of the capabilities of the QMK firmware.&lt;&#x2F;p&gt;
 &lt;h2 id=&quot;design-keycaps&quot;&gt;Design Keycaps&lt;&#x2F;h2&gt;
-&lt;p&gt;For this &amp;quot;DIY&amp;quot; kit, it felt important to design my own icons. I&#x27;m no graphic designer, but it was kinda fun. To do this, I used &amp;quot;re-legendable&amp;quot; keycaps that snap together with a clear top. Then, I printed the icons on plain white paper, cut them out, and sandwiched each icon in the keycaps. Here&#x27;s a photo of my efforts:&lt;&#x2F;p&gt;
-&lt;p&gt;&lt;img src=&quot;sweet16-completed.jpg&quot; alt=&quot;Sweet16 Completed&quot; &#x2F;&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;For this &quot;DIY&quot; kit, it felt important to design my own icons. I&#x27;m no graphic designer, but it was kinda fun. To do this, I used &quot;re-legendable&quot; keycaps that snap together with a clear top. Then, I printed the icons on plain white paper, cut them out, and sandwiched each icon in the keycaps. Here&#x27;s a photo of my efforts:&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;img src=&quot;https:&#x2F;&#x2F;0xC45.com&#x2F;blog&#x2F;4x4-macro-pad&#x2F;sweet16-completed.jpg&quot; alt=&quot;Sweet16 Completed&quot; &#x2F;&gt;&lt;&#x2F;p&gt;
 &lt;h2 id=&quot;conclusion&quot;&gt;Conclusion&lt;&#x2F;h2&gt;
-&lt;p&gt;This was a pretty quick project, but I felt like it deserved a writeup nevertheless. As a relative beginner at soldering, this kit was a fantastic way to increase my skills and ability beyond the &amp;quot;absolute beginner&amp;quot; level required for most keyboard kits. Furthermore, the final product is quite useful and extensible. Beyond the specific purpose as a simple macro pad keyboard, this hardware is essentially a microcontroller connected to a set of buttons. There are numerous possible applications. It&#x27;s ripe for hacking. This device could become a MIDI controller, home automation remote, or anything else my imagination might dream up. Until next time.&lt;&#x2F;p&gt;
+&lt;p&gt;This was a pretty quick project, but I felt like it deserved a writeup nevertheless. As a relative beginner at soldering, this kit was a fantastic way to increase my skills and ability beyond the &quot;absolute beginner&quot; level required for most keyboard kits. Furthermore, the final product is quite useful and extensible. Beyond the specific purpose as a simple macro pad keyboard, this hardware is essentially a microcontroller connected to a set of buttons. There are numerous possible applications. It&#x27;s ripe for hacking. This device could become a MIDI controller, home automation remote, or anything else my imagination might dream up. Until next time.&lt;&#x2F;p&gt;
 &lt;h2 id=&quot;links&quot;&gt;Links&lt;&#x2F;h2&gt;
 &lt;ol&gt;
 &lt;li&gt;Sweeet 16 Macro Pad Kit: &lt;a href=&quot;https:&#x2F;&#x2F;www.1upkeyboards.com&#x2F;shop&#x2F;keyboard-kits&#x2F;macro-pads&#x2F;sweet-16-macro-pad-black&#x2F;&quot;&gt;https:&#x2F;&#x2F;www.1upkeyboards.com&#x2F;shop&#x2F;keyboard-kits&#x2F;macro-pads&#x2F;sweet-16-macro-pad-black&#x2F;&lt;&#x2F;a&gt;&lt;&#x2F;li&gt;
@@ -175,21 +196,32 @@
 &lt;li&gt;My Sweet 16 Keymap: &lt;a href=&quot;https:&#x2F;&#x2F;github.com&#x2F;0xC45&#x2F;qmk-firmware&#x2F;blob&#x2F;master&#x2F;keyboards&#x2F;1upkeyboards&#x2F;sweet16&#x2F;keymaps&#x2F;0xC45&#x2F;keymap.c&quot;&gt;https:&#x2F;&#x2F;github.com&#x2F;0xC45&#x2F;qmk-firmware&#x2F;blob&#x2F;master&#x2F;keyboards&#x2F;1upkeyboards&#x2F;sweet16&#x2F;keymaps&#x2F;0xC45&#x2F;keymap.c&lt;&#x2F;a&gt;&lt;&#x2F;li&gt;
 &lt;&#x2F;ol&gt;
 </content>
-	</entry>
-	<entry xml:lang="en">
-		<title>Ansible-defined Homelab</title>
-		<published>2020-07-25T00:00:00+00:00</published>
-		<updated>2020-07-25T00:00:00+00:00</updated>
-		<link href="https://0xC45.com/blog/ansible-defined-homelab/" type="text/html"/>
-		<id>https://0xC45.com/blog/ansible-defined-homelab/</id>
-		<content type="html">&lt;h2 id=&quot;overview&quot;&gt;Overview&lt;&#x2F;h2&gt;
-&lt;p&gt;Around November of last year, I started a project to wrangle my digital life. Tired of haphazardly increasing my subjectivity by trusting &amp;quot;free&amp;quot; websites to provide various services, I wanted to wrest some control over my internet existence. I made a plan to self-host several &amp;quot;critical&amp;quot; services on my home network and maintain them personally. In short, I made a homelab.&lt;&#x2F;p&gt;
+        
+    </entry>
+    <entry xml:lang="en">
+        <title>Ansible-defined Homelab</title>
+        <published>2020-07-25T00:00:00+00:00</published>
+        <updated>2020-07-25T00:00:00+00:00</updated>
+        
+        <author>
+          <name>
+            
+              Jason Vigil
+            
+          </name>
+        </author>
+        
+        <link rel="alternate" type="text/html" href="https://0xC45.com/blog/ansible-defined-homelab/"/>
+        <id>https://0xC45.com/blog/ansible-defined-homelab/</id>
+        
+        <content type="html" xml:base="https://0xC45.com/blog/ansible-defined-homelab/">&lt;h2 id=&quot;overview&quot;&gt;Overview&lt;&#x2F;h2&gt;
+&lt;p&gt;Around November of last year, I started a project to wrangle my digital life. Tired of haphazardly increasing my subjectivity by trusting &quot;free&quot; websites to provide various services, I wanted to wrest some control over my internet existence. I made a plan to self-host several &quot;critical&quot; services on my home network and maintain them personally. In short, I made a homelab.&lt;&#x2F;p&gt;
 &lt;p&gt;To be frank, the professional websites that I was previously dependent upon are undoubtedly more reliable than my cobbled-together hobby project of a homelab. However, on general principle (and because it seemed like a fun way to learn some sysadmin &#x2F; devops skills), I made this setup:&lt;&#x2F;p&gt;
-&lt;p&gt;&lt;img src=&quot;homelab-network-diagram.svg&quot; alt=&quot;Homelab Network Diagram&quot; &#x2F;&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;img src=&quot;https:&#x2F;&#x2F;0xC45.com&#x2F;blog&#x2F;ansible-defined-homelab&#x2F;homelab-network-diagram.svg&quot; alt=&quot;Homelab Network Diagram&quot; &#x2F;&gt;&lt;&#x2F;p&gt;
 &lt;p&gt;As you can see, I have deployed a couple of general-purpose compute platforms: 4 ESXi hypervisors, and a Kubernetes cluster. Additionally, there are several VM-based services: Nextcloud, Gitea, and Harbor. For data storage and backup, I use a Synology NAS. Finally, a custom OpenBSD-based router provides internet connectivity to everything. In order to reduce operational overhead, I crafted &lt;a href=&quot;https:&#x2F;&#x2F;github.com&#x2F;0xC45&#x2F;homelab-setup&quot;&gt;a set of Ansible scripts&lt;&#x2F;a&gt; that deploy and configure all of these components.&lt;&#x2F;p&gt;
 &lt;p&gt;Overall, making this setup has been quite a journey. In this blog post, I will describe my uses for each of these services, share my thoughts and experiences so far, and attempt to articulate my future improvement plans.&lt;&#x2F;p&gt;
 &lt;h2 id=&quot;motivation&quot;&gt;Motivation&lt;&#x2F;h2&gt;
-&lt;p&gt;Of course, everything you see above already exists as a service on the internet. If my goal were solely the end feature set, it would have been much simpler to pay for each service. In most cases, there are even &amp;quot;free&amp;quot; versions available. For example, if I only cared about having access to a web-based git repository UI, I could have signed up for a Github or Gitlab account rather than bother setting up a Gitea VM on my home network.&lt;&#x2F;p&gt;
+&lt;p&gt;Of course, everything you see above already exists as a service on the internet. If my goal were solely the end feature set, it would have been much simpler to pay for each service. In most cases, there are even &quot;free&quot; versions available. For example, if I only cared about having access to a web-based git repository UI, I could have signed up for a Github or Gitlab account rather than bother setting up a Gitea VM on my home network.&lt;&#x2F;p&gt;
 &lt;p&gt;However, like most of my hobby projects, this endeavor was more about the journey than the destination. By setting up these services on my home network, I learned a bunch of useful devops and sysadmin skills. Additionally, by running my own services, I have achieved the philosophical goal of reducing my reliance on 3rd party services. Now, if any of the services that I rely upon break, I am empowered to fix them.&lt;&#x2F;p&gt;
 &lt;h2 id=&quot;components&quot;&gt;Components&lt;&#x2F;h2&gt;
 &lt;p&gt;So, without further ado, let&#x27;s dive into each of the components that make up my homelab. For each component, I will describe the main utility it provides me, why I chose it, and any additional commentary that may be helpful.&lt;&#x2F;p&gt;
@@ -204,17 +236,17 @@
 &lt;p&gt;In addition to the VM-based compute platform provided by ESXi, I run Kubernetes to provide a container-based compute platform. Though I do not currently use my Kubernetes cluster for anything, I have plans to setup &lt;a href=&quot;https:&#x2F;&#x2F;argoproj.github.io&#x2F;&quot;&gt;Argo CI&#x2F;CD&lt;&#x2F;a&gt;, experiment with &lt;a href=&quot;https:&#x2F;&#x2F;knative.dev&#x2F;&quot;&gt;kNative&lt;&#x2F;a&gt;, develop some operators, and maybe run a &lt;a href=&quot;https:&#x2F;&#x2F;github.com&#x2F;helm&#x2F;charts&#x2F;tree&#x2F;master&#x2F;stable&#x2F;factorio&quot;&gt;factorio game server&lt;&#x2F;a&gt;.&lt;&#x2F;p&gt;
 &lt;p&gt;The Kubernetes cluster consists of 6 VMs running across 3 Intel NUCs. I chose to install Kubernetes on VMs with the ESXi hypervisor layer for ease of management. At some point, I&#x27;m sure to break things, want to reconfigure, etc. With the hypervisor, it&#x27;s easier to perform these type of adjustments. Furthermore, at some point in the future, I may switch to &lt;a href=&quot;https:&#x2F;&#x2F;tanzu.vmware.com&#x2F;kubernetes-grid&quot;&gt;TKG&lt;&#x2F;a&gt;, a vSphere-integrated distribution of Kubernetes.&lt;&#x2F;p&gt;
 &lt;h3 id=&quot;synology-nas&quot;&gt;Synology NAS&lt;&#x2F;h3&gt;
-&lt;p&gt;For backups and storing important data, I use a &lt;a href=&quot;https:&#x2F;&#x2F;www.synology.com&#x2F;en-global&#x2F;products&#x2F;DS218+&quot;&gt;Synology NAS&lt;&#x2F;a&gt;. Though I didn&#x27;t really shop around and compare NAS products &#x2F; vendors, I am happy with the Synology so far. That being said, I would like to create my own NAS from scratch at some point in the future. However, the Synology product includes several features &amp;quot;out-of-the-box&amp;quot; that would be potentially difficult to replicate.&lt;&#x2F;p&gt;
-&lt;p&gt;First, it has an easy-to-use application called &lt;a href=&quot;https:&#x2F;&#x2F;www.synology.com&#x2F;en-us&#x2F;dsm&#x2F;feature&#x2F;active_backup_business&quot;&gt;&amp;quot;Active Backup for Business&amp;quot;&lt;&#x2F;a&gt; that can automatically take backups of ESXi virtual machines following configurable schedules and retention policies.&lt;&#x2F;p&gt;
-&lt;p&gt;The VM backup application pairs nicely with the automatic cloud backup application, &lt;a href=&quot;https:&#x2F;&#x2F;www.synology.com&#x2F;en-us&#x2F;dsm&#x2F;packages&#x2F;GlacierBackup&quot;&gt;&amp;quot;Glacier Backup&amp;quot;&lt;&#x2F;a&gt;. Every night, after the VMs are backed-up to the NAS, I replicate the backups to Amazon S3 Glacier. Hopefully, this way I won&#x27;t ever lose data.&lt;&#x2F;p&gt;
+&lt;p&gt;For backups and storing important data, I use a &lt;a href=&quot;https:&#x2F;&#x2F;www.synology.com&#x2F;en-global&#x2F;products&#x2F;DS218+&quot;&gt;Synology NAS&lt;&#x2F;a&gt;. Though I didn&#x27;t really shop around and compare NAS products &#x2F; vendors, I am happy with the Synology so far. That being said, I would like to create my own NAS from scratch at some point in the future. However, the Synology product includes several features &quot;out-of-the-box&quot; that would be potentially difficult to replicate.&lt;&#x2F;p&gt;
+&lt;p&gt;First, it has an easy-to-use application called &lt;a href=&quot;https:&#x2F;&#x2F;www.synology.com&#x2F;en-us&#x2F;dsm&#x2F;feature&#x2F;active_backup_business&quot;&gt;&quot;Active Backup for Business&quot;&lt;&#x2F;a&gt; that can automatically take backups of ESXi virtual machines following configurable schedules and retention policies.&lt;&#x2F;p&gt;
+&lt;p&gt;The VM backup application pairs nicely with the automatic cloud backup application, &lt;a href=&quot;https:&#x2F;&#x2F;www.synology.com&#x2F;en-us&#x2F;dsm&#x2F;packages&#x2F;GlacierBackup&quot;&gt;&quot;Glacier Backup&quot;&lt;&#x2F;a&gt;. Every night, after the VMs are backed-up to the NAS, I replicate the backups to Amazon S3 Glacier. Hopefully, this way I won&#x27;t ever lose data.&lt;&#x2F;p&gt;
 &lt;p&gt;Finally, the Synology has built-in UPS integration. If &lt;a href=&quot;https:&#x2F;&#x2F;www.apc.com&#x2F;shop&#x2F;us&#x2F;en&#x2F;products&#x2F;APC-Power-Saving-Back-UPS-Pro-1500&#x2F;P-BR1500G&quot;&gt;my UPS&lt;&#x2F;a&gt; loses power for more than one minute, the NAS will cleanly shutdown, preventing any data corruption that could be caused by an unexpected power loss.&lt;&#x2F;p&gt;
 &lt;h3 id=&quot;nextcloud-vm&quot;&gt;Nextcloud VM&lt;&#x2F;h3&gt;
-&lt;p&gt;I use &lt;a href=&quot;https:&#x2F;&#x2F;nextcloud.com&#x2F;&quot;&gt;Nextcloud&lt;&#x2F;a&gt; as my &amp;quot;personal cloud&amp;quot;. I use it to store my important files and photos. The desktop &#x2F; mobile application synchronizes the files across all of my devices, allowing me to edit and view my files from anywhere. &lt;&#x2F;p&gt;
-&lt;p&gt;Nextcloud also has the capability to install &amp;quot;apps&amp;quot; that provide additional functionality. Currently, I have only installed one app, &lt;a href=&quot;https:&#x2F;&#x2F;apps.nextcloud.com&#x2F;apps&#x2F;deck&quot;&gt;&amp;quot;Deck&amp;quot;&lt;&#x2F;a&gt;. Deck is a Kanban-style project management and organization tool. I use Deck to plan, organize, and record progress on my hobby projects.&lt;&#x2F;p&gt;
+&lt;p&gt;I use &lt;a href=&quot;https:&#x2F;&#x2F;nextcloud.com&#x2F;&quot;&gt;Nextcloud&lt;&#x2F;a&gt; as my &quot;personal cloud&quot;. I use it to store my important files and photos. The desktop &#x2F; mobile application synchronizes the files across all of my devices, allowing me to edit and view my files from anywhere.&lt;&#x2F;p&gt;
+&lt;p&gt;Nextcloud also has the capability to install &quot;apps&quot; that provide additional functionality. Currently, I have only installed one app, &lt;a href=&quot;https:&#x2F;&#x2F;apps.nextcloud.com&#x2F;apps&#x2F;deck&quot;&gt;&quot;Deck&quot;&lt;&#x2F;a&gt;. Deck is a Kanban-style project management and organization tool. I use Deck to plan, organize, and record progress on my hobby projects.&lt;&#x2F;p&gt;
 &lt;p&gt;Because it gives me the capability to install (and potentially create) apps, Nextcloud is an extensible platform. It&#x27;s open source and under active development. Though the recent major version upgrade was a bit rocky (for me, at least), I&#x27;m happy with Nextcloud and plan to stick with it.&lt;&#x2F;p&gt;
 &lt;h3 id=&quot;gitea-vm&quot;&gt;Gitea VM&lt;&#x2F;h3&gt;
 &lt;p&gt;Of course, I need a place to store my code. For that purpose, I use &lt;a href=&quot;https:&#x2F;&#x2F;gitea.io&#x2F;en-us&#x2F;&quot;&gt;Gitea&lt;&#x2F;a&gt;. I prefer Gitea to Gitlab because it&#x27;s lighter-weight. Unlike Gitlab, there aren&#x27;t a million additional features bundled-in that add bloat (in my opinion). Also, I slightly prefer the Gitea UI over the Gitlab UI.&lt;&#x2F;p&gt;
-&lt;p&gt;There&#x27;s really not much else to say about Gitea. It works great for my purposes. I push all of my code to the Gitea VM running on my home network. Whenever I want to &amp;quot;publish&amp;quot; a project or share it with the world, I push my code to a public Github repo.&lt;&#x2F;p&gt;
+&lt;p&gt;There&#x27;s really not much else to say about Gitea. It works great for my purposes. I push all of my code to the Gitea VM running on my home network. Whenever I want to &quot;publish&quot; a project or share it with the world, I push my code to a public Github repo.&lt;&#x2F;p&gt;
 &lt;h3 id=&quot;harbor-vm&quot;&gt;Harbor VM&lt;&#x2F;h3&gt;
 &lt;p&gt;To make container images available for running on my Kubernetes cluster, I need a container registry. For this purpose, I use &lt;a href=&quot;https:&#x2F;&#x2F;goharbor.io&#x2F;&quot;&gt;Harbor&lt;&#x2F;a&gt;, an open source solution that seems to be the current most popular self-hosted container registry. In addition to providing a standard API for pushing&#x2F;pulling container images, Harbor has the useful capability to scan container images for known vulnerabilities.&lt;&#x2F;p&gt;
 &lt;p&gt;Harbor has worked well for me so far, but I haven&#x27;t really placed it under a serious workload. Soon, I will start using my Kubernetes cluster for various projects, which will require pushing &#x2F; pulling images from Harbor on a regular basis. Perhaps, at some point in the future, I will have a more nuanced opinion of Harbor.&lt;&#x2F;p&gt;
@@ -223,26 +255,37 @@
 &lt;p&gt;First, I want to install &lt;a href=&quot;https:&#x2F;&#x2F;argoproj.github.io&#x2F;&quot;&gt;Argo&lt;&#x2F;a&gt; on the Kubernetes cluster to run pipeline-based workflows. For example, it could be useful to automatically run tests for every commit that gets pushed to my repositories on Gitea. More generally, I could configure Argo to trigger a job for any arbitrary external event. It could be used to create a notification service. Or, it could be used to manage heavy workloads. There are endless potential uses for a pipeline-based workflow engine such as Argo.&lt;&#x2F;p&gt;
 &lt;p&gt;Second, I want to create a dashboard that provides a graphical representation of the status of each of my homelab components using &lt;a href=&quot;https:&#x2F;&#x2F;grafana.com&#x2F;&quot;&gt;Grafana&lt;&#x2F;a&gt;. Using various open-source tools, I could collect metrics and aggregate them. Then, using Grafana, I could visualize the data. It would be useful to be able to quickly ascertain the state of my home network services in order to understand workloads, diagnose issues, etc.&lt;&#x2F;p&gt;
 &lt;h2 id=&quot;conclusion&quot;&gt;Conclusion&lt;&#x2F;h2&gt;
-&lt;p&gt;With the work spanning several months, creating my homelab has been quite a journey. Along the way, I started to grow weary, concerned that I had signed myself up for the all-consuming task of operating my homelab. With the overhead required to maintain all the various components, how could I ever have time for anything else? However, I&#x27;m happy to report that the Ansible script automation has proved worthwhile. Now, upgrades, configuration changes, and various &amp;quot;day 2&amp;quot; operations are quick and simple. At this point, I&#x27;m looking forward to shifting gears and working on something else for a while, using my homelab services as helpful tools along the way.&lt;&#x2F;p&gt;
+&lt;p&gt;With the work spanning several months, creating my homelab has been quite a journey. Along the way, I started to grow weary, concerned that I had signed myself up for the all-consuming task of operating my homelab. With the overhead required to maintain all the various components, how could I ever have time for anything else? However, I&#x27;m happy to report that the Ansible script automation has proved worthwhile. Now, upgrades, configuration changes, and various &quot;day 2&quot; operations are quick and simple. At this point, I&#x27;m looking forward to shifting gears and working on something else for a while, using my homelab services as helpful tools along the way.&lt;&#x2F;p&gt;
 &lt;h2 id=&quot;links&quot;&gt;Links&lt;&#x2F;h2&gt;
 &lt;ol&gt;
 &lt;li&gt;Homelab Ansible scripts: &lt;a href=&quot;https:&#x2F;&#x2F;github.com&#x2F;0xC45&#x2F;homelab-setup&quot;&gt;https:&#x2F;&#x2F;github.com&#x2F;0xC45&#x2F;homelab-setup&lt;&#x2F;a&gt;&lt;&#x2F;li&gt;
-&lt;li&gt;&amp;quot;OpenBSD Home Router&amp;quot; blog post: &lt;a href=&quot;https:&#x2F;&#x2F;0xc45.com&#x2F;blog&#x2F;openbsd-home-router&#x2F;&quot;&gt;https:&#x2F;&#x2F;0xc45.com&#x2F;blog&#x2F;openbsd-home-router&#x2F;&lt;&#x2F;a&gt;&lt;&#x2F;li&gt;
+&lt;li&gt;&quot;OpenBSD Home Router&quot; blog post: &lt;a href=&quot;https:&#x2F;&#x2F;0xc45.com&#x2F;blog&#x2F;openbsd-home-router&#x2F;&quot;&gt;https:&#x2F;&#x2F;0xc45.com&#x2F;blog&#x2F;openbsd-home-router&#x2F;&lt;&#x2F;a&gt;&lt;&#x2F;li&gt;
 &lt;&#x2F;ol&gt;
 </content>
-	</entry>
-	<entry xml:lang="en">
-		<title>My Zola Workflow</title>
-		<published>2020-07-05T00:00:00+00:00</published>
-		<updated>2020-07-05T00:00:00+00:00</updated>
-		<link href="https://0xC45.com/blog/my-zola-workflow/" type="text/html"/>
-		<id>https://0xC45.com/blog/my-zola-workflow/</id>
-		<content type="html">&lt;h2 id=&quot;overview&quot;&gt;Overview&lt;&#x2F;h2&gt;
+        
+    </entry>
+    <entry xml:lang="en">
+        <title>My Zola Workflow</title>
+        <published>2020-07-05T00:00:00+00:00</published>
+        <updated>2020-07-05T00:00:00+00:00</updated>
+        
+        <author>
+          <name>
+            
+              Jason Vigil
+            
+          </name>
+        </author>
+        
+        <link rel="alternate" type="text/html" href="https://0xC45.com/blog/my-zola-workflow/"/>
+        <id>https://0xC45.com/blog/my-zola-workflow/</id>
+        
+        <content type="html" xml:base="https://0xC45.com/blog/my-zola-workflow/">&lt;h2 id=&quot;overview&quot;&gt;Overview&lt;&#x2F;h2&gt;
 &lt;p&gt;To build this website, I use the &lt;a href=&quot;https:&#x2F;&#x2F;www.getzola.org&#x2F;&quot;&gt;Zola static site engine&lt;&#x2F;a&gt;. So far, it has worked great. In this blog post, I will discuss my workflow improvements for using Zola, developing my blog posts, and publishing this website. As a quick intro, however, I will give a brief summary of the main features of Zola and why I chose to use it.&lt;&#x2F;p&gt;
 &lt;h3 id=&quot;what-is-zola&quot;&gt;What is Zola?&lt;&#x2F;h3&gt;
-&lt;p&gt;Zola advertises itself as a static site engine. It &amp;quot;compiles&amp;quot; Markdown content files, HTML templates (based on the &lt;a href=&quot;https:&#x2F;&#x2F;tera.netlify.app&#x2F;&quot;&gt;Tera template engine&lt;&#x2F;a&gt;), and &lt;a href=&quot;https:&#x2F;&#x2F;sass-lang.com&#x2F;&quot;&gt;Sass&lt;&#x2F;a&gt; styling into static HTML and CSS pages. This way, a Zola website does not require any server-side code to &amp;quot;render&amp;quot; the website pages.&lt;&#x2F;p&gt;
+&lt;p&gt;Zola advertises itself as a static site engine. It &quot;compiles&quot; Markdown content files, HTML templates (based on the &lt;a href=&quot;https:&#x2F;&#x2F;tera.netlify.app&#x2F;&quot;&gt;Tera template engine&lt;&#x2F;a&gt;), and &lt;a href=&quot;https:&#x2F;&#x2F;sass-lang.com&#x2F;&quot;&gt;Sass&lt;&#x2F;a&gt; styling into static HTML and CSS pages. This way, a Zola website does not require any server-side code to &quot;render&quot; the website pages.&lt;&#x2F;p&gt;
 &lt;p&gt;In addition, Zola has several convenience features that one would want for a blog or website, such as built-in &lt;a href=&quot;https:&#x2F;&#x2F;www.getzola.org&#x2F;documentation&#x2F;content&#x2F;syntax-highlighting&#x2F;&quot;&gt;syntax highlighting&lt;&#x2F;a&gt;, simplified &lt;a href=&quot;https:&#x2F;&#x2F;www.getzola.org&#x2F;documentation&#x2F;templates&#x2F;pagination&#x2F;&quot;&gt;pagination&lt;&#x2F;a&gt;, and auto-generation of &lt;a href=&quot;https:&#x2F;&#x2F;www.getzola.org&#x2F;documentation&#x2F;templates&#x2F;feeds&#x2F;&quot;&gt;atom&#x2F;rss feeds&lt;&#x2F;a&gt;.&lt;&#x2F;p&gt;
-&lt;p&gt;So, Zola is an all-in-one tool for generating static websites. As a blog author, I can mainly focus on writing my blog post content (in Markdown). I don&#x27;t have to worry too much about HTML syntax, CSS styling, linking, pagination, or my Atom feed (after the initial setup and creation of my site theme). When I&#x27;m done writing a blog post, I &amp;quot;generate&amp;quot; the static site with Zola. All of the repetitive and error-prone work is handled for me and the actual static website pages are produced.&lt;&#x2F;p&gt;
+&lt;p&gt;So, Zola is an all-in-one tool for generating static websites. As a blog author, I can mainly focus on writing my blog post content (in Markdown). I don&#x27;t have to worry too much about HTML syntax, CSS styling, linking, pagination, or my Atom feed (after the initial setup and creation of my site theme). When I&#x27;m done writing a blog post, I &quot;generate&quot; the static site with Zola. All of the repetitive and error-prone work is handled for me and the actual static website pages are produced.&lt;&#x2F;p&gt;
 &lt;h3 id=&quot;why-use-zola&quot;&gt;Why use Zola?&lt;&#x2F;h3&gt;
 &lt;p&gt;There are many competing static site generators out there. Zola is but one of many. Currently, Hugo and Jekyll are probably the two most popular static site generators. However, for this website, I chose to use Zola for a few reasons:&lt;&#x2F;p&gt;
 &lt;ul&gt;
@@ -251,11 +294,11 @@
 &lt;li&gt;It&#x27;s a relatively new project. Why not give it a try?&lt;&#x2F;li&gt;
 &lt;&#x2F;ul&gt;
 &lt;h2 id=&quot;my-zola-workflow&quot;&gt;My Zola Workflow&lt;&#x2F;h2&gt;
-&lt;p&gt;Rather than repeat stuff you can find in the Zola documentation, in this blog post I will cover three of my personal &amp;quot;workflow hacks&amp;quot; for working with Zola. Hopefully at least a couple of these patterns are useful to you.&lt;&#x2F;p&gt;
+&lt;p&gt;Rather than repeat stuff you can find in the Zola documentation, in this blog post I will cover three of my personal &quot;workflow hacks&quot; for working with Zola. Hopefully at least a couple of these patterns are useful to you.&lt;&#x2F;p&gt;
 &lt;h3 id=&quot;git-pre-push-hook&quot;&gt;Git pre-push Hook&lt;&#x2F;h3&gt;
-&lt;p&gt;Because this blog is hosted on Github pages, &lt;code&gt;git push&lt;&#x2F;code&gt; is equivalent to publishing the site. Early on, I made the mistake of writing an entire blog post, but forgetting to &amp;quot;generate&amp;quot; the static site. So, I made a commit, pushed, and nothing happened.&lt;&#x2F;p&gt;
-&lt;p&gt;To prevent myself from making this mistake again, I added a &amp;quot;pre-push&amp;quot; hook to my git repo. Now, git will refuse to push if the generated static site is out of date.&lt;&#x2F;p&gt;
-&lt;p&gt;Here is my simple &amp;quot;pre-push&amp;quot; git hook:&lt;&#x2F;p&gt;
+&lt;p&gt;Because this blog is hosted on Github pages, &lt;code&gt;git push&lt;&#x2F;code&gt; is equivalent to publishing the site. Early on, I made the mistake of writing an entire blog post, but forgetting to &quot;generate&quot; the static site. So, I made a commit, pushed, and nothing happened.&lt;&#x2F;p&gt;
+&lt;p&gt;To prevent myself from making this mistake again, I added a &quot;pre-push&quot; hook to my git repo. Now, git will refuse to push if the generated static site is out of date.&lt;&#x2F;p&gt;
+&lt;p&gt;Here is my simple &quot;pre-push&quot; git hook:&lt;&#x2F;p&gt;
 &lt;pre data-lang=&quot;bash&quot; style=&quot;background-color:#2b303b;color:#c0c5ce;&quot; class=&quot;language-bash &quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span style=&quot;color:#65737e;&quot;&gt;#!&#x2F;usr&#x2F;bin&#x2F;env bash
 &lt;&#x2F;span&gt;&lt;span&gt;
 &lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;project_root&lt;&#x2F;span&gt;&lt;span&gt;=&amp;quot;$&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a3be8c;&quot;&gt;( &lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;git&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a3be8c;&quot;&gt; rev-parse&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt; --show-toplevel &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a3be8c;&quot;&gt;)&lt;&#x2F;span&gt;&lt;span&gt;&amp;quot;
@@ -306,35 +349,46 @@
 &lt;p&gt;There are three main targets: &lt;code&gt;all&lt;&#x2F;code&gt;, &lt;code&gt;serve&lt;&#x2F;code&gt;, and &lt;code&gt;clean&lt;&#x2F;code&gt;.&lt;&#x2F;p&gt;
 &lt;ul&gt;
 &lt;li&gt;&lt;code&gt;all&lt;&#x2F;code&gt;: This target generates the static site.&lt;&#x2F;li&gt;
-&lt;li&gt;&lt;code&gt;serve&lt;&#x2F;code&gt;: This target runs a &amp;quot;development&amp;quot; server on my local machine, allowing me to preview changes.&lt;&#x2F;li&gt;
+&lt;li&gt;&lt;code&gt;serve&lt;&#x2F;code&gt;: This target runs a &quot;development&quot; server on my local machine, allowing me to preview changes.&lt;&#x2F;li&gt;
 &lt;li&gt;&lt;code&gt;clean&lt;&#x2F;code&gt;: This target deletes the directory containing the generated static site.&lt;&#x2F;li&gt;
 &lt;&#x2F;ul&gt;
 &lt;h2 id=&quot;conclusion&quot;&gt;Conclusion&lt;&#x2F;h2&gt;
 &lt;p&gt;So, there you have it. These are my custom workflow improvements for using the Zola static site engine. So far, Zola has been a fantastic utility for generating my blog site. Of course, it does not have all the features of other popular static site generators, but it&#x27;s perfect for my use case. It&#x27;s simple, easy to use, fast, and capable. I definitely recommend checking it out.&lt;&#x2F;p&gt;
 </content>
-	</entry>
-	<entry xml:lang="en">
-		<title>OpenSSL Certificate Authority</title>
-		<published>2020-05-24T00:00:00+00:00</published>
-		<updated>2020-05-24T00:00:00+00:00</updated>
-		<link href="https://0xC45.com/blog/openssl-certificate-authority/" type="text/html"/>
-		<id>https://0xC45.com/blog/openssl-certificate-authority/</id>
-		<content type="html">&lt;h2 id=&quot;overview&quot;&gt;Overview&lt;&#x2F;h2&gt;
-&lt;p&gt;At this point, HTTPS (HTTP encrypted with SSL&#x2F;TLS) is nearly ubiquitous across the internet. You could say that any website that doesn&#x27;t use HTTPS is behind the times. However, encrypting internet communications only achieves privacy from snooping third parties. In order to prevent &amp;quot;man in the middle&amp;quot; attacks, where an imposter pretends to represent the website you&#x27;re trying to visit (and tricks you into giving them your passwords, secret data, etc.), it&#x27;s also necessary to ensure that you&#x27;re actually communicating with the website that you think you&#x27;re communicating with. In other words, there needs to be a system in place that enables you to verify the identity of every website that you visit. The current system used on the internet involves certificates (objects that &amp;quot;prove&amp;quot; the identity of a website) and certificate authorities (entities that you trust).&lt;&#x2F;p&gt;
+        
+    </entry>
+    <entry xml:lang="en">
+        <title>OpenSSL Certificate Authority</title>
+        <published>2020-05-24T00:00:00+00:00</published>
+        <updated>2020-05-24T00:00:00+00:00</updated>
+        
+        <author>
+          <name>
+            
+              Jason Vigil
+            
+          </name>
+        </author>
+        
+        <link rel="alternate" type="text/html" href="https://0xC45.com/blog/openssl-certificate-authority/"/>
+        <id>https://0xC45.com/blog/openssl-certificate-authority/</id>
+        
+        <content type="html" xml:base="https://0xC45.com/blog/openssl-certificate-authority/">&lt;h2 id=&quot;overview&quot;&gt;Overview&lt;&#x2F;h2&gt;
+&lt;p&gt;At this point, HTTPS (HTTP encrypted with SSL&#x2F;TLS) is nearly ubiquitous across the internet. You could say that any website that doesn&#x27;t use HTTPS is behind the times. However, encrypting internet communications only achieves privacy from snooping third parties. In order to prevent &quot;man in the middle&quot; attacks, where an imposter pretends to represent the website you&#x27;re trying to visit (and tricks you into giving them your passwords, secret data, etc.), it&#x27;s also necessary to ensure that you&#x27;re actually communicating with the website that you think you&#x27;re communicating with. In other words, there needs to be a system in place that enables you to verify the identity of every website that you visit. The current system used on the internet involves certificates (objects that &quot;prove&quot; the identity of a website) and certificate authorities (entities that you trust).&lt;&#x2F;p&gt;
 &lt;h3 id=&quot;motivation&quot;&gt;Motivation&lt;&#x2F;h3&gt;
-&lt;p&gt;On my home network, I run a few HTTPS services for miscellaneous things. In the past, I have generated a one-off, &amp;quot;self-signed&amp;quot; certificate for each of these services and clicked through the browser warning about the untrusted, self-signed certificate that every service presented.&lt;&#x2F;p&gt;
+&lt;p&gt;On my home network, I run a few HTTPS services for miscellaneous things. In the past, I have generated a one-off, &quot;self-signed&quot; certificate for each of these services and clicked through the browser warning about the untrusted, self-signed certificate that every service presented.&lt;&#x2F;p&gt;
 &lt;p&gt;However, the browser warning should not be taken lightly. If, every time, I blindly click through the warning about the self-signed certificate (without actually checking that the certificate matches what I would expect), then I am vulnerable to a man in the middle attack. If I blindly trust every certificate, there is no difference between a valid and an invalid certificate.&lt;&#x2F;p&gt;
 &lt;p&gt;In order to solve this problem, I created a certificate authority for my internal home network HTTPS services. By configuring my browser to trust my certificate authority, the warnings disappear (as long as the certificates presented are actually valid). Now, any browser warning is an actual cause for concern (as it should be).&lt;&#x2F;p&gt;
 &lt;p&gt;Originally, I considered taking this project on for security reasons, but quite honestly, the threat model that accounts for the presence of an actual man in the middle attack within my internal home network is quite dubious. More realistically, I learned a lot with this project and (here&#x27;s the real benefit) now I no longer need to click through annoying browser warnings whenever I visit the HTTPS services on my home network. Additionally, if I ever expose any of my services on the public internet, I could continue to use my personal certificate authority to enable HTTPS.&lt;&#x2F;p&gt;
 &lt;h3 id=&quot;how-does-it-work&quot;&gt;How Does it Work?&lt;&#x2F;h3&gt;
 &lt;p&gt;When I browse to a website, how does my browser know that I am actually communicating with that website (and not someone else pretending to be that website)? The answer lies in the root certificates that are trusted by my browser.&lt;&#x2F;p&gt;
-&lt;p&gt;By default, most browsers trust a number of root certificates. These root certificates are owned and managed by organizations who serve as &amp;quot;certificate authorities&amp;quot;. Certificate authorities approve and revoke certificates. Supposedly, certificate authorities perform their due diligence to ensure that they only approve and sign certificates when the entity requesting the certificate is the actual owner of the website.&lt;&#x2F;p&gt;
-&lt;p&gt;It is (theoretically and&#x2F;or practically) impossible for someone to forge a signed certificate without a copy of the certificate authority private key. So, when my browser verifies a website&#x27;s certificate, it checks that the certificate presented by the website is &amp;quot;signed&amp;quot; by a root certificate that the browser trusts. As long as a trusted root certificate authority approved and signed the website&#x27;s certificate, then my browser trusts the website. Now, the browser warnings about my one-off, self-signed certificates make sense. The browser warns whenever it encounters a certificate that was not signed by a trusted root certificate.&lt;&#x2F;p&gt;
-&lt;p&gt;&lt;img src=&quot;figure-1.svg&quot; alt=&quot;Figure 1: Trusted vs. Untrusted Certificates&quot; &#x2F;&gt;&lt;&#x2F;p&gt;
-&lt;p&gt;However, in reality, it&#x27;s slightly more complicated than the picture above. In most cases, there are probably multiple certificates that form a chain back to the root certificate. For example, the certificate from the website would be signed by an &amp;quot;intermediate&amp;quot; certificate authority, which is then signed by a root certificate authority. As long as the chain of signed certificates ends in a root certificate that my browser trusts, the website is trusted.&lt;&#x2F;p&gt;
-&lt;p&gt;&lt;img src=&quot;figure-2.svg&quot; alt=&quot;Figure 2: Intermediate Certificate&quot; &#x2F;&gt;&lt;&#x2F;p&gt;
-&lt;p&gt;So, with that background information, I can describe this project in a little more detail. Using the OpenSSL free cryptography software, I created my own root certificate and used that root certificate to sign a number of leaf certificates for the various services running on my internal home network. Therefore, I am now acting as my own certificate authority. Next, I configured my browser to &amp;quot;trust&amp;quot; my personal root certificate. Now, whenever I browse to any of my internal HTTPS services, my browser no longer warns about the certificate because I have made it become trusted by my browser.&lt;&#x2F;p&gt;
-&lt;p&gt;&lt;img src=&quot;figure-3.svg&quot; alt=&quot;Figure 3: Custom Certificate Authority&quot; &#x2F;&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;By default, most browsers trust a number of root certificates. These root certificates are owned and managed by organizations who serve as &quot;certificate authorities&quot;. Certificate authorities approve and revoke certificates. Supposedly, certificate authorities perform their due diligence to ensure that they only approve and sign certificates when the entity requesting the certificate is the actual owner of the website.&lt;&#x2F;p&gt;
+&lt;p&gt;It is (theoretically and&#x2F;or practically) impossible for someone to forge a signed certificate without a copy of the certificate authority private key. So, when my browser verifies a website&#x27;s certificate, it checks that the certificate presented by the website is &quot;signed&quot; by a root certificate that the browser trusts. As long as a trusted root certificate authority approved and signed the website&#x27;s certificate, then my browser trusts the website. Now, the browser warnings about my one-off, self-signed certificates make sense. The browser warns whenever it encounters a certificate that was not signed by a trusted root certificate.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;img src=&quot;https:&#x2F;&#x2F;0xC45.com&#x2F;blog&#x2F;openssl-certificate-authority&#x2F;figure-1.svg&quot; alt=&quot;Figure 1: Trusted vs. Untrusted Certificates&quot; &#x2F;&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;However, in reality, it&#x27;s slightly more complicated than the picture above. In most cases, there are probably multiple certificates that form a chain back to the root certificate. For example, the certificate from the website would be signed by an &quot;intermediate&quot; certificate authority, which is then signed by a root certificate authority. As long as the chain of signed certificates ends in a root certificate that my browser trusts, the website is trusted.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;img src=&quot;https:&#x2F;&#x2F;0xC45.com&#x2F;blog&#x2F;openssl-certificate-authority&#x2F;figure-2.svg&quot; alt=&quot;Figure 2: Intermediate Certificate&quot; &#x2F;&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;So, with that background information, I can describe this project in a little more detail. Using the OpenSSL free cryptography software, I created my own root certificate and used that root certificate to sign a number of leaf certificates for the various services running on my internal home network. Therefore, I am now acting as my own certificate authority. Next, I configured my browser to &quot;trust&quot; my personal root certificate. Now, whenever I browse to any of my internal HTTPS services, my browser no longer warns about the certificate because I have made it become trusted by my browser.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;img src=&quot;https:&#x2F;&#x2F;0xC45.com&#x2F;blog&#x2F;openssl-certificate-authority&#x2F;figure-3.svg&quot; alt=&quot;Figure 3: Custom Certificate Authority&quot; &#x2F;&gt;&lt;&#x2F;p&gt;
 &lt;h2 id=&quot;process&quot;&gt;Process&lt;&#x2F;h2&gt;
 &lt;p&gt;Standing up a personal certificate authority does not require a ton of work per se. It requires running only a handful of different commands. Every step can be performed with the openssl command line utility. However, openssl is a complicated program with a steep learning curve. In addition to the dozens of sub-commands and command line flags, the program reads a rather large configuration file for instructions that affect its behavior.&lt;&#x2F;p&gt;
 &lt;p&gt;After quite a bit of experimentation and documentation reading, I created a (hopefully) suitable configuration file for the purposes of my personal CA. First, I will explain my configuration file. Then, I will demonstrate the few commands needed to generate a root certificate and sign a leaf certificate.&lt;&#x2F;p&gt;
@@ -346,11 +400,11 @@
 &lt;&#x2F;span&gt;&lt;span&gt;prompt = no
 &lt;&#x2F;span&gt;&lt;span&gt;distinguished_name = req_distinguished_name
 &lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
-&lt;p&gt;The &amp;quot;req&amp;quot; section configures the behavior of the req sub-command and therefore affects how openssl generates certificate requests (both CA certificate requests and leaf certificate requests).&lt;&#x2F;p&gt;
+&lt;p&gt;The &quot;req&quot; section configures the behavior of the req sub-command and therefore affects how openssl generates certificate requests (both CA certificate requests and leaf certificate requests).&lt;&#x2F;p&gt;
 &lt;ul&gt;
-&lt;li&gt;&lt;code&gt;string_mask = utf8only&lt;&#x2F;code&gt; masks the request to produce only utf8 characters. This is the recommended setting (according to the openssl docs, &amp;quot;this is the PKIX recommendation in RFC2459 after 2003&amp;quot;).&lt;&#x2F;li&gt;
-&lt;li&gt;&lt;code&gt;prompt = no&lt;&#x2F;code&gt; disables &amp;quot;interactive mode&amp;quot;. The utility will not prompt for the DN (distinguished name) values on the command line interactively. Instead, the &amp;quot;distinguished_name&amp;quot; config option specifies a config section that contains the DN values to include in the request.&lt;&#x2F;li&gt;
-&lt;li&gt;&lt;code&gt;distinguished_name = req_distinguished_name&lt;&#x2F;code&gt; specifies the section containing the DN values. So, let&#x27;s take a look at the &amp;quot;req_distinguished_name&amp;quot; section next.&lt;&#x2F;li&gt;
+&lt;li&gt;&lt;code&gt;string_mask = utf8only&lt;&#x2F;code&gt; masks the request to produce only utf8 characters. This is the recommended setting (according to the openssl docs, &quot;this is the PKIX recommendation in RFC2459 after 2003&quot;).&lt;&#x2F;li&gt;
+&lt;li&gt;&lt;code&gt;prompt = no&lt;&#x2F;code&gt; disables &quot;interactive mode&quot;. The utility will not prompt for the DN (distinguished name) values on the command line interactively. Instead, the &quot;distinguished_name&quot; config option specifies a config section that contains the DN values to include in the request.&lt;&#x2F;li&gt;
+&lt;li&gt;&lt;code&gt;distinguished_name = req_distinguished_name&lt;&#x2F;code&gt; specifies the section containing the DN values. So, let&#x27;s take a look at the &quot;req_distinguished_name&quot; section next.&lt;&#x2F;li&gt;
 &lt;&#x2F;ul&gt;
 &lt;pre style=&quot;background-color:#2b303b;color:#c0c5ce;&quot;&gt;&lt;code&gt;&lt;span&gt;[ req_distinguished_name ]
 &lt;&#x2F;span&gt;&lt;span&gt;C = US
@@ -360,12 +414,12 @@
 &lt;&#x2F;span&gt;&lt;span&gt;CN = Jason Vigil
 &lt;&#x2F;span&gt;&lt;span&gt;emailAddress = jason@0xc45.com
 &lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
-&lt;p&gt;The &amp;quot;req_distinguished_name&amp;quot; section specifies the DN (distinguished name) values for my certificate requests. Here, I give some information about where I am located (my country, state, and locale), my &amp;quot;organization name&amp;quot;, my common name, and my email. The CA copies this information from certificate requests to signed certificates. Then, anyone can inspect a certificate and identify who it belongs to. Although, for a personal certificate authority, these values may not matter all that much.&lt;&#x2F;p&gt;
+&lt;p&gt;The &quot;req_distinguished_name&quot; section specifies the DN (distinguished name) values for my certificate requests. Here, I give some information about where I am located (my country, state, and locale), my &quot;organization name&quot;, my common name, and my email. The CA copies this information from certificate requests to signed certificates. Then, anyone can inspect a certificate and identify who it belongs to. Although, for a personal certificate authority, these values may not matter all that much.&lt;&#x2F;p&gt;
 &lt;h4 id=&quot;ca-configuration&quot;&gt;CA Configuration&lt;&#x2F;h4&gt;
 &lt;pre style=&quot;background-color:#2b303b;color:#c0c5ce;&quot;&gt;&lt;code&gt;&lt;span&gt;[ ca ]
 &lt;&#x2F;span&gt;&lt;span&gt;default_ca = ca_default
 &lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
-&lt;p&gt;The &amp;quot;ca&amp;quot; section configures the openssl &amp;quot;ca&amp;quot; sub-command. This section affects how the certificate authority behaves when signing certificate requests. It contains only one config value. The &lt;code&gt;default_ca&lt;&#x2F;code&gt; option sets the default section to use for the CA configuration. This value may be overridden on the command line, causing openssl to utilize a different section for configuration. However, for my purposes, I only need one type of CA configuration. So, the &lt;code&gt;ca_default&lt;&#x2F;code&gt; section contains most of the configuration for my CA.&lt;&#x2F;p&gt;
+&lt;p&gt;The &quot;ca&quot; section configures the openssl &quot;ca&quot; sub-command. This section affects how the certificate authority behaves when signing certificate requests. It contains only one config value. The &lt;code&gt;default_ca&lt;&#x2F;code&gt; option sets the default section to use for the CA configuration. This value may be overridden on the command line, causing openssl to utilize a different section for configuration. However, for my purposes, I only need one type of CA configuration. So, the &lt;code&gt;ca_default&lt;&#x2F;code&gt; section contains most of the configuration for my CA.&lt;&#x2F;p&gt;
 &lt;pre style=&quot;background-color:#2b303b;color:#c0c5ce;&quot;&gt;&lt;code&gt;&lt;span&gt;[ ca_default ]
 &lt;&#x2F;span&gt;&lt;span&gt;dir = .&#x2F;ca
 &lt;&#x2F;span&gt;&lt;span&gt;certificate = $dir&#x2F;ca.cert.pem
@@ -396,13 +450,13 @@
 &lt;p&gt;The following options affect the behavior of the CA when signing certificate requests.&lt;&#x2F;p&gt;
 &lt;ul&gt;
 &lt;li&gt;
-&lt;p&gt;&lt;code&gt;default_days = 30&lt;&#x2F;code&gt; gives new certificates a lifespan of 30 days (by default). After 30 days from the time of signing, a certificate becomes invalid. It is possible to override this value on the command line with the &amp;quot;-days&amp;quot; flag.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;code&gt;default_days = 30&lt;&#x2F;code&gt; gives new certificates a lifespan of 30 days (by default). After 30 days from the time of signing, a certificate becomes invalid. It is possible to override this value on the command line with the &quot;-days&quot; flag.&lt;&#x2F;p&gt;
 &lt;&#x2F;li&gt;
 &lt;li&gt;
 &lt;p&gt;&lt;code&gt;default_md = sha256&lt;&#x2F;code&gt; sets the default message digest for signing the certificate requests to sha256. Rather than use the default value (which leaves it up to the implementation), I decided to manually set the value to sha256. On one of my machines, I noticed the implementation used sha1 as the default. I opted to override the default in order to standardize and ensure the use of the newer sha256 algorithm.&lt;&#x2F;p&gt;
 &lt;&#x2F;li&gt;
 &lt;li&gt;
-&lt;p&gt;&lt;code&gt;copy_extensions = copy&lt;&#x2F;code&gt; copies extensions from the certificate request (that aren&#x27;t already present) to the signed certificate. This setting allows the certificate requester to specify the extensions they want applied to the signed certificate. Later on, you will see that I take advantage of this setting for every leaf certificate request to specify an extension containing a &amp;quot;subjectAltName&amp;quot; value. The CA copies the extension to the signed certificate because of this configuration setting.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;code&gt;copy_extensions = copy&lt;&#x2F;code&gt; copies extensions from the certificate request (that aren&#x27;t already present) to the signed certificate. This setting allows the certificate requester to specify the extensions they want applied to the signed certificate. Later on, you will see that I take advantage of this setting for every leaf certificate request to specify an extension containing a &quot;subjectAltName&quot; value. The CA copies the extension to the signed certificate because of this configuration setting.&lt;&#x2F;p&gt;
 &lt;&#x2F;li&gt;
 &lt;li&gt;
 &lt;p&gt;&lt;code&gt;unique_subject = no&lt;&#x2F;code&gt; allows multiple signed certificates to have the same subject. The documentation recommends this setting in order to make CA certificate roll-over easier. I&#x27;m not sure that it will ever matter for my purposes, but I couldn&#x27;t see the harm in allowing multiple certificates with the same subject, so I went with the recommended value.&lt;&#x2F;p&gt;
@@ -430,14 +484,14 @@
 &lt;&#x2F;span&gt;&lt;span&gt;authorityKeyIdentifier = keyid:always
 &lt;&#x2F;span&gt;&lt;span&gt;keyUsage = keyCertSign
 &lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
-&lt;p&gt;This section specifies additional configuration (beyond the &amp;quot;ca_default&amp;quot; section) for producing a CA certificate. When creating a CA certificate with the &amp;quot;openssl ca&amp;quot; command, I manually include this section with the &amp;quot;-extensions&amp;quot; flag.&lt;&#x2F;p&gt;
+&lt;p&gt;This section specifies additional configuration (beyond the &quot;ca_default&quot; section) for producing a CA certificate. When creating a CA certificate with the &quot;openssl ca&quot; command, I manually include this section with the &quot;-extensions&quot; flag.&lt;&#x2F;p&gt;
 &lt;ul&gt;
 &lt;li&gt;
-&lt;p&gt;&lt;code&gt;basicConstraints = critical,CA:true,pathlen:0&lt;&#x2F;code&gt; sets the configuration for the multi-valued &amp;quot;basicConstraints&amp;quot; extension using &amp;quot;short form&amp;quot; syntax.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;code&gt;basicConstraints = critical,CA:true,pathlen:0&lt;&#x2F;code&gt; sets the configuration for the multi-valued &quot;basicConstraints&quot; extension using &quot;short form&quot; syntax.&lt;&#x2F;p&gt;
 &lt;ul&gt;
-&lt;li&gt;&lt;code&gt;critical&lt;&#x2F;code&gt; makes &amp;quot;basicConstraints&amp;quot; a critical extension because it affects important behavior. Therefore, a certificate using system that does not recognize the &amp;quot;basicConstraints&amp;quot; extension must reject the certificate rater than potentially use it incorrectly.&lt;&#x2F;li&gt;
-&lt;li&gt;&lt;code&gt;CA:true&lt;&#x2F;code&gt; configures the &amp;quot;ca&amp;quot; utility to sign requests and produce CA certificates. Certificates that are signed with this setting enabled may be used to sign requests to produce new certificates.&lt;&#x2F;li&gt;
-&lt;li&gt;&lt;code&gt;pathlen:0&lt;&#x2F;code&gt; limits the capabilities of certificates that are signed with this setting enabled. Certificates that are signed with this setting enabled can only sign and produce &amp;quot;leaf&amp;quot; certificates. They cannot sign and produce additional CA certificates.&lt;&#x2F;li&gt;
+&lt;li&gt;&lt;code&gt;critical&lt;&#x2F;code&gt; makes &quot;basicConstraints&quot; a critical extension because it affects important behavior. Therefore, a certificate using system that does not recognize the &quot;basicConstraints&quot; extension must reject the certificate rater than potentially use it incorrectly.&lt;&#x2F;li&gt;
+&lt;li&gt;&lt;code&gt;CA:true&lt;&#x2F;code&gt; configures the &quot;ca&quot; utility to sign requests and produce CA certificates. Certificates that are signed with this setting enabled may be used to sign requests to produce new certificates.&lt;&#x2F;li&gt;
+&lt;li&gt;&lt;code&gt;pathlen:0&lt;&#x2F;code&gt; limits the capabilities of certificates that are signed with this setting enabled. Certificates that are signed with this setting enabled can only sign and produce &quot;leaf&quot; certificates. They cannot sign and produce additional CA certificates.&lt;&#x2F;li&gt;
 &lt;&#x2F;ul&gt;
 &lt;&#x2F;li&gt;
 &lt;li&gt;
@@ -457,7 +511,7 @@
 &lt;&#x2F;span&gt;&lt;span&gt;authorityKeyIdentifier = keyid:always
 &lt;&#x2F;span&gt;&lt;span&gt;keyUsage = nonRepudiation,digitalSignature,keyEncipherment
 &lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
-&lt;p&gt;This section specifies additional configuration (beyond the &amp;quot;ca_default&amp;quot; section) for producing a leaf certificate. When creating a leaf certificate with the &amp;quot;openssl ca&amp;quot; command, I manually include this section with the &amp;quot;-extensions&amp;quot; flag.&lt;&#x2F;p&gt;
+&lt;p&gt;This section specifies additional configuration (beyond the &quot;ca_default&quot; section) for producing a leaf certificate. When creating a leaf certificate with the &quot;openssl ca&quot; command, I manually include this section with the &quot;-extensions&quot; flag.&lt;&#x2F;p&gt;
 &lt;ul&gt;
 &lt;li&gt;
 &lt;p&gt;&lt;code&gt;basicConstraints = CA:false&lt;&#x2F;code&gt; means the leaf certificate cannot be used to sign other certificates.&lt;&#x2F;p&gt;
@@ -507,7 +561,7 @@
 &lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;    -key&lt;&#x2F;span&gt;&lt;span&gt; ca&#x2F;private&#x2F;key.pem \
 &lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;    -out&lt;&#x2F;span&gt;&lt;span&gt; ca&#x2F;ca.req.pem
 &lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
-&lt;p&gt;This creates a new certificate request using the config file &amp;quot;openssl.cnf&amp;quot; (created before) and the CA private key from the previous step. The resulting certificate request is written to &amp;quot;ca&#x2F;ca.req.pem&amp;quot;.&lt;&#x2F;p&gt;
+&lt;p&gt;This creates a new certificate request using the config file &quot;openssl.cnf&quot; (created before) and the CA private key from the previous step. The resulting certificate request is written to &quot;ca&#x2F;ca.req.pem&quot;.&lt;&#x2F;p&gt;
 &lt;&#x2F;li&gt;
 &lt;li&gt;
 &lt;p&gt;Self-sign certificate request:&lt;&#x2F;p&gt;
@@ -520,11 +574,11 @@
 &lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;    -in&lt;&#x2F;span&gt;&lt;span&gt; ca&#x2F;ca.req.pem \
 &lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;    -out&lt;&#x2F;span&gt;&lt;span&gt; ca&#x2F;ca.cert.pem
 &lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
-&lt;p&gt;This command &amp;quot;self-signs&amp;quot; the certificate request. It adds the extensions in the &amp;quot;ca_extensions&amp;quot; section of the config file to the certificate. It overrides the config value &amp;quot;default_days&amp;quot; and makes the certificate valid for 365 days. The certificate is signed with the CA&#x27;s own private key. This is why it&#x27;s called a &amp;quot;self-signed&amp;quot; certificate. The resulting root certificate is written to &amp;quot;ca&#x2F;ca.cert.pem&amp;quot;.&lt;&#x2F;p&gt;
+&lt;p&gt;This command &quot;self-signs&quot; the certificate request. It adds the extensions in the &quot;ca_extensions&quot; section of the config file to the certificate. It overrides the config value &quot;default_days&quot; and makes the certificate valid for 365 days. The certificate is signed with the CA&#x27;s own private key. This is why it&#x27;s called a &quot;self-signed&quot; certificate. The resulting root certificate is written to &quot;ca&#x2F;ca.cert.pem&quot;.&lt;&#x2F;p&gt;
 &lt;&#x2F;li&gt;
 &lt;&#x2F;ol&gt;
 &lt;h3 id=&quot;3-generate-leaf-certificates&quot;&gt;3. Generate Leaf Certificates&lt;&#x2F;h3&gt;
-&lt;p&gt;After generating a root certificate, we can use it to sign leaf certificates. This process closely resembles the steps required to produce a self-signed root certificate. First, we need to generate a private key. Then, we use the key to create a certificate request. Then, we sign the certificate request with the certificate authority private key to produce a leaf certificate. Lastly, we combine the root certificate and the leaf certificate into a single file to &amp;quot;chain&amp;quot; them together.&lt;&#x2F;p&gt;
+&lt;p&gt;After generating a root certificate, we can use it to sign leaf certificates. This process closely resembles the steps required to produce a self-signed root certificate. First, we need to generate a private key. Then, we use the key to create a certificate request. Then, we sign the certificate request with the certificate authority private key to produce a leaf certificate. Lastly, we combine the root certificate and the leaf certificate into a single file to &quot;chain&quot; them together.&lt;&#x2F;p&gt;
 &lt;ol&gt;
 &lt;li&gt;
 &lt;p&gt;Generate private key:&lt;&#x2F;p&gt;
@@ -541,7 +595,7 @@
 &lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;    -key&lt;&#x2F;span&gt;&lt;span&gt; ca&#x2F;reqs&#x2F;test.key.pem \
 &lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;    -out&lt;&#x2F;span&gt;&lt;span&gt; ca&#x2F;reqs&#x2F;test.req.pem
 &lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
-&lt;p&gt;This creates a new certificate request using the config file &amp;quot;openssl.cnf&amp;quot; (created before) and the private key from the previous step. It adds the &amp;quot;subjectAltName&amp;quot; extension to specify the DNS name for the service that will use the leaf certificate. The resulting certificate request is written to &amp;quot;ca&#x2F;reqs&#x2F;test.req.pem&amp;quot;.&lt;&#x2F;p&gt;
+&lt;p&gt;This creates a new certificate request using the config file &quot;openssl.cnf&quot; (created before) and the private key from the previous step. It adds the &quot;subjectAltName&quot; extension to specify the DNS name for the service that will use the leaf certificate. The resulting certificate request is written to &quot;ca&#x2F;reqs&#x2F;test.req.pem&quot;.&lt;&#x2F;p&gt;
 &lt;&#x2F;li&gt;
 &lt;li&gt;
 &lt;p&gt;Sign certificate request:&lt;&#x2F;p&gt;
@@ -552,20 +606,20 @@
 &lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;    -in&lt;&#x2F;span&gt;&lt;span&gt; ca&#x2F;reqs&#x2F;test.req.pem \
 &lt;&#x2F;span&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;    -out&lt;&#x2F;span&gt;&lt;span&gt; ca&#x2F;reqs&#x2F;test.cert.pem
 &lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
-&lt;p&gt;This command signs the certificate request. It adds the extensions in the &amp;quot;leaf_extensions&amp;quot; section of the config file to the certificate. The certificate is signed with the CA private key. The resulting root certificate is written to &amp;quot;ca&#x2F;reqs&#x2F;test.cert.pem&amp;quot;.&lt;&#x2F;p&gt;
+&lt;p&gt;This command signs the certificate request. It adds the extensions in the &quot;leaf_extensions&quot; section of the config file to the certificate. The certificate is signed with the CA private key. The resulting root certificate is written to &quot;ca&#x2F;reqs&#x2F;test.cert.pem&quot;.&lt;&#x2F;p&gt;
 &lt;&#x2F;li&gt;
 &lt;li&gt;
 &lt;p&gt;Combine root and leaf certificates:&lt;&#x2F;p&gt;
 &lt;pre data-lang=&quot;bash&quot; style=&quot;background-color:#2b303b;color:#c0c5ce;&quot; class=&quot;language-bash &quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span style=&quot;color:#bf616a;&quot;&gt;cat&lt;&#x2F;span&gt;&lt;span&gt; ca&#x2F;reqs&#x2F;test.cert.pem ca&#x2F;ca.cert.pem &amp;gt; test.cert.pem
 &lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
-&lt;p&gt;Here, we combine the leaf certificate and the root certificate to produce a certificate &amp;quot;chain&amp;quot; (of length two). Any application that receives this chain can verify that the leaf certificate was signed by the private key associated with the root certificate.&lt;&#x2F;p&gt;
+&lt;p&gt;Here, we combine the leaf certificate and the root certificate to produce a certificate &quot;chain&quot; (of length two). Any application that receives this chain can verify that the leaf certificate was signed by the private key associated with the root certificate.&lt;&#x2F;p&gt;
 &lt;&#x2F;li&gt;
 &lt;&#x2F;ol&gt;
 &lt;h2 id=&quot;disclaimer-and-best-practices&quot;&gt;Disclaimer and Best Practices&lt;&#x2F;h2&gt;
 &lt;p&gt;Of course, the certificate authority described in this blog post should not be used for production in corporate networks or anywhere where stuff actually matters. My personal certificate authority omits a couple of features considered to be best practices. Here are a couple features that real-world CAs have and my reasoning for not including them:&lt;&#x2F;p&gt;
 &lt;ul&gt;
 &lt;li&gt;
-&lt;p&gt;Best practices advise utilizing &amp;quot;intermediate&amp;quot; CA certificates to form a certificate chain of length 3 (at minimum). The root certificate private key should be kept highly protected. Therefore, the root certificate private key should be rarely used only when it&#x27;s necessary to sign additional intermediate CA certificates or to revoke compromised intermediate CA certificates. The intermediate CAs can be treated as slightly more disposable and their private keys will sign all leaf certificates.&lt;&#x2F;p&gt;
+&lt;p&gt;Best practices advise utilizing &quot;intermediate&quot; CA certificates to form a certificate chain of length 3 (at minimum). The root certificate private key should be kept highly protected. Therefore, the root certificate private key should be rarely used only when it&#x27;s necessary to sign additional intermediate CA certificates or to revoke compromised intermediate CA certificates. The intermediate CAs can be treated as slightly more disposable and their private keys will sign all leaf certificates.&lt;&#x2F;p&gt;
 &lt;p&gt;This pattern is considered a best practice because it&#x27;s a big deal if a root certificate private key is compromised. Every browser that previously trusted the root certificate would need to be updated. It&#x27;s embarrassing for the certificate authority and will cause people to question their overall security.&lt;&#x2F;p&gt;
 &lt;&#x2F;li&gt;
 &lt;li&gt;
@@ -574,7 +628,7 @@
 &lt;&#x2F;ul&gt;
 &lt;p&gt;After considering my use case, I decided that I don&#x27;t need these features. It&#x27;s unlikely that any of my certificate private keys will ever become compromised because none of the services using them are accessible over the public internet. Additionally, should I ever want to roll my certificates, it wouldn&#x27;t be a huge burden to recreate all of my certificates (including the root certificate) and update the root certificate in my browser. I am only one person. On a large corporate network, this would be onerous.&lt;&#x2F;p&gt;
 &lt;h2 id=&quot;conclusion&quot;&gt;Conclusion&lt;&#x2F;h2&gt;
-&lt;p&gt;This project has been quite a journey. Before beginning, I had a fuzzy idea of how certificates worked. Now, I understand in much greater detail how the certificate &amp;quot;chain of trust&amp;quot; works and how browsers are able to verify the identity of websites. Also, I am more capable of using the openssl utilities. I have learned a lot.&lt;&#x2F;p&gt;
+&lt;p&gt;This project has been quite a journey. Before beginning, I had a fuzzy idea of how certificates worked. Now, I understand in much greater detail how the certificate &quot;chain of trust&quot; works and how browsers are able to verify the identity of websites. Also, I am more capable of using the openssl utilities. I have learned a lot.&lt;&#x2F;p&gt;
 &lt;p&gt;However, on some level, I feel like I have only started to scratch the surface. The openssl req&#x2F;ca utilities have a lot of complexity that enables many use cases beyond my simple example. It surprised me that certificates can actually contain a seemingly arbitrary number of (potentially custom) extensions. There are certainly numerous uses for certificates and various extensions that I still don&#x27;t know about.&lt;&#x2F;p&gt;
 &lt;p&gt;Regardless, my home network now benefits from creating this simple CA. By now, I am somewhat tired of reading through the openssl manual pages and the X.509 certificate RFC. Fortunately, this is a good stopping point. There are no more browser warnings. I have improved my home network security. Time to close the books on this one... for now.&lt;&#x2F;p&gt;
 &lt;h2 id=&quot;resources&quot;&gt;Resources&lt;&#x2F;h2&gt;
@@ -586,15 +640,26 @@
 &lt;li&gt;&lt;a href=&quot;https:&#x2F;&#x2F;www.openssl.org&#x2F;docs&#x2F;man1.1.1&#x2F;man1&#x2F;CA.pl.html&quot;&gt;https:&#x2F;&#x2F;www.openssl.org&#x2F;docs&#x2F;man1.1.1&#x2F;man1&#x2F;CA.pl.html&lt;&#x2F;a&gt;&lt;&#x2F;li&gt;
 &lt;&#x2F;ul&gt;
 </content>
-	</entry>
-	<entry xml:lang="en">
-		<title>OpenBSD Home Router</title>
-		<published>2020-04-25T00:00:00+00:00</published>
-		<updated>2020-04-25T00:00:00+00:00</updated>
-		<link href="https://0xC45.com/blog/openbsd-home-router/" type="text/html"/>
-		<id>https://0xC45.com/blog/openbsd-home-router/</id>
-		<content type="html">&lt;h2 id=&quot;overview&quot;&gt;Overview&lt;&#x2F;h2&gt;
-&lt;p&gt;Recently, I made a home router from scratch using &lt;a href=&quot;https:&#x2F;&#x2F;www.openbsd.org&#x2F;66.html&quot;&gt;OpenBSD 6.6&lt;&#x2F;a&gt;, without installing any additional packages, using only what comes with the basic OS installation. Originally, before deciding to &amp;quot;do it from scratch&amp;quot;, I had a goal to make a router using open source software in order to improve my network security. After looking at some popular open source firewall and routing projects (mainly &lt;a href=&quot;https:&#x2F;&#x2F;www.pfsense.org&#x2F;&quot;&gt;pfSense&lt;&#x2F;a&gt; and &lt;a href=&quot;https:&#x2F;&#x2F;opnsense.org&#x2F;&quot;&gt;OPNSense&lt;&#x2F;a&gt;), I finally decided to build my own. pfSense and OPNSense both seem like decent software (and I have successfully used both in the past), but this time, I wanted to &amp;quot;do it the hard way&amp;quot; and learn about the services that make up a typical router. Here are some of the cool features that my custom device currently has:&lt;&#x2F;p&gt;
+        
+    </entry>
+    <entry xml:lang="en">
+        <title>OpenBSD Home Router</title>
+        <published>2020-04-25T00:00:00+00:00</published>
+        <updated>2020-04-25T00:00:00+00:00</updated>
+        
+        <author>
+          <name>
+            
+              Jason Vigil
+            
+          </name>
+        </author>
+        
+        <link rel="alternate" type="text/html" href="https://0xC45.com/blog/openbsd-home-router/"/>
+        <id>https://0xC45.com/blog/openbsd-home-router/</id>
+        
+        <content type="html" xml:base="https://0xC45.com/blog/openbsd-home-router/">&lt;h2 id=&quot;overview&quot;&gt;Overview&lt;&#x2F;h2&gt;
+&lt;p&gt;Recently, I made a home router from scratch using &lt;a href=&quot;https:&#x2F;&#x2F;www.openbsd.org&#x2F;66.html&quot;&gt;OpenBSD 6.6&lt;&#x2F;a&gt;, without installing any additional packages, using only what comes with the basic OS installation. Originally, before deciding to &quot;do it from scratch&quot;, I had a goal to make a router using open source software in order to improve my network security. After looking at some popular open source firewall and routing projects (mainly &lt;a href=&quot;https:&#x2F;&#x2F;www.pfsense.org&#x2F;&quot;&gt;pfSense&lt;&#x2F;a&gt; and &lt;a href=&quot;https:&#x2F;&#x2F;opnsense.org&#x2F;&quot;&gt;OPNSense&lt;&#x2F;a&gt;), I finally decided to build my own. pfSense and OPNSense both seem like decent software (and I have successfully used both in the past), but this time, I wanted to &quot;do it the hard way&quot; and learn about the services that make up a typical router. Here are some of the cool features that my custom device currently has:&lt;&#x2F;p&gt;
 &lt;ol&gt;
 &lt;li&gt;It&#x27;s almost fully open source, down to the BIOS and firmware. Unfortunately, the hardware isn&#x27;t open source.&lt;&#x2F;li&gt;
 &lt;li&gt;It ensures that every DNS request leaving my network is encrypted.&lt;&#x2F;li&gt;
@@ -602,7 +667,7 @@
 &lt;li&gt;It supports custom local network DNS entries, allowing me to refer to the various services on my network using memorable names, rather than IP addresses.&lt;&#x2F;li&gt;
 &lt;&#x2F;ol&gt;
 &lt;p&gt;Of course, because this device is configured and built from scratch, the sky is the limit in terms of potential features and improvements. In the future, I may add improvements such as a VPN server or metrics reporting &#x2F; analytics.&lt;&#x2F;p&gt;
-&lt;p&gt;Before we begin, because I can&#x27;t really claim to know what I&#x27;m doing (I&#x27;m not a networking &#x2F; firewall expert), I must make a disclaimer. This is a toy project. You probably shouldn&#x27;t use this in production. However, having said that, I have been using this setup (in &amp;quot;production&amp;quot;) for several months now and it has been stable. I haven&#x27;t noticed any internet issues caused by this appliance. In addition, it seems quite secure. OpenBSD has a reputation for being a secure OS and I made every effort to configure the various services correctly. If you notice any mistakes with this configuration (or potential improvements to make), please let me know! Anyway, let&#x27;s dive into the details.&lt;&#x2F;p&gt;
+&lt;p&gt;Before we begin, because I can&#x27;t really claim to know what I&#x27;m doing (I&#x27;m not a networking &#x2F; firewall expert), I must make a disclaimer. This is a toy project. You probably shouldn&#x27;t use this in production. However, having said that, I have been using this setup (in &quot;production&quot;) for several months now and it has been stable. I haven&#x27;t noticed any internet issues caused by this appliance. In addition, it seems quite secure. OpenBSD has a reputation for being a secure OS and I made every effort to configure the various services correctly. If you notice any mistakes with this configuration (or potential improvements to make), please let me know! Anyway, let&#x27;s dive into the details.&lt;&#x2F;p&gt;
 &lt;h2 id=&quot;hardware-apu2&quot;&gt;Hardware (apu2)&lt;&#x2F;h2&gt;
 &lt;p&gt;First, I needed an actual machine for my home network appliance. After considering the various options (purchase a device, build something myself, use a virtual machine, etc.) I decided to use an &lt;a href=&quot;https:&#x2F;&#x2F;pcengines.ch&#x2F;apu2.htm&quot;&gt;apu2&lt;&#x2F;a&gt;. It is a low-power, relatively inexpensive yet performant solution, which makes it ideal for this kind of application. In addition, it uses an open source BIOS (&lt;a href=&quot;https:&#x2F;&#x2F;github.com&#x2F;pcengines&#x2F;seabios&quot;&gt;SeaBIOS&lt;&#x2F;a&gt;) and firmware (&lt;a href=&quot;https:&#x2F;&#x2F;github.com&#x2F;pcengines&#x2F;coreboot&quot;&gt;coreboot&lt;&#x2F;a&gt;). I went with a model that has a quad-core processor, 4GB memory, and 3 separate gigabit NICs. In addition, I purchased a 16GB M-SATA SSD (for the main OS installation), a 4GB SD (for a utility OS installation), a case, and a serial cable (the apu2 does not have a port for graphics output). The total cost was roughly $160.&lt;&#x2F;p&gt;
 &lt;p&gt;After the device arrived, the first challenge was connecting to it. Ok, it wasn&#x27;t actually that challenging. I connected to the apu2 with my OpenBSD netbook and the serial cable:&lt;&#x2F;p&gt;
@@ -610,12 +675,12 @@
 &lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
 &lt;p&gt;No matter which software you use to connect to the apu2 over serial, the important setting is the default baud rate, 115200.&lt;&#x2F;p&gt;
 &lt;h2 id=&quot;firmware-coreboot&quot;&gt;Firmware (coreboot)&lt;&#x2F;h2&gt;
-&lt;p&gt;After booting up the apu2, I noticed that the BIOS was a bit out of date. It was probably flashed with the current BIOS version at the time of manufacturing, which was likely a while before it ended up in my hands. So, I needed to upgrade the BIOS. The &lt;a href=&quot;https:&#x2F;&#x2F;pcengines.ch&#x2F;howto.htm#bios&quot;&gt;official instructions&lt;&#x2F;a&gt; describe a method to update the BIOS using a PC Engines custom TinyCore Linux distribution. However, since I was already planning to make two different boot disks, one for the router OS and one for a &amp;quot;utility&amp;quot; OS, I decided to setup the utility OS and make it capable of flashing the BIOS.&lt;&#x2F;p&gt;
+&lt;p&gt;After booting up the apu2, I noticed that the BIOS was a bit out of date. It was probably flashed with the current BIOS version at the time of manufacturing, which was likely a while before it ended up in my hands. So, I needed to upgrade the BIOS. The &lt;a href=&quot;https:&#x2F;&#x2F;pcengines.ch&#x2F;howto.htm#bios&quot;&gt;official instructions&lt;&#x2F;a&gt; describe a method to update the BIOS using a PC Engines custom TinyCore Linux distribution. However, since I was already planning to make two different boot disks, one for the router OS and one for a &quot;utility&quot; OS, I decided to setup the utility OS and make it capable of flashing the BIOS.&lt;&#x2F;p&gt;
 &lt;h3 id=&quot;utility-os-debian&quot;&gt;Utility OS (Debian)&lt;&#x2F;h3&gt;
-&lt;p&gt;Given that my apu2 device has two disks, it made sense to create a separate OS installation on the second disk. In addition to being capable of flashing the BIOS, I envision the second &amp;quot;utility&amp;quot; OS as a backup plan, in case I ever misconfigure the main router OS and want to attempt to debug network issues in a fresh environment. I would only boot into the utility OS for special situations. Generally, the device will always be running the main router OS.&lt;&#x2F;p&gt;
-&lt;p&gt;For the &amp;quot;utility&amp;quot; OS, I decided to use Debian Linux, because I like Debian. So, I made a Debian USB installer and booted the apu2 from it. There are a few important steps to follow in order to boot the Debian installer into a serial tty (thanks to &lt;a href=&quot;https:&#x2F;&#x2F;teklager.se&#x2F;en&#x2F;knowledge-base&#x2F;installing-debian-over-serial-console-apu-board&#x2F;&quot;&gt;TekLager&lt;&#x2F;a&gt; for the post on how to boot Debian on an apu2).&lt;&#x2F;p&gt;
+&lt;p&gt;Given that my apu2 device has two disks, it made sense to create a separate OS installation on the second disk. In addition to being capable of flashing the BIOS, I envision the second &quot;utility&quot; OS as a backup plan, in case I ever misconfigure the main router OS and want to attempt to debug network issues in a fresh environment. I would only boot into the utility OS for special situations. Generally, the device will always be running the main router OS.&lt;&#x2F;p&gt;
+&lt;p&gt;For the &quot;utility&quot; OS, I decided to use Debian Linux, because I like Debian. So, I made a Debian USB installer and booted the apu2 from it. There are a few important steps to follow in order to boot the Debian installer into a serial tty (thanks to &lt;a href=&quot;https:&#x2F;&#x2F;teklager.se&#x2F;en&#x2F;knowledge-base&#x2F;installing-debian-over-serial-console-apu-board&#x2F;&quot;&gt;TekLager&lt;&#x2F;a&gt; for the post on how to boot Debian on an apu2).&lt;&#x2F;p&gt;
 &lt;ol&gt;
-&lt;li&gt;Highlight the &amp;quot;Install&amp;quot; boot option (not &amp;quot;Graphical Install&amp;quot;)&lt;&#x2F;li&gt;
+&lt;li&gt;Highlight the &quot;Install&quot; boot option (not &quot;Graphical Install&quot;)&lt;&#x2F;li&gt;
 &lt;li&gt;Press &lt;code&gt;&amp;lt;tab&amp;gt;&lt;&#x2F;code&gt; to edit the boot entry&lt;&#x2F;li&gt;
 &lt;li&gt;Remove &lt;code&gt;vga=xxx&lt;&#x2F;code&gt; to disable graphical output&lt;&#x2F;li&gt;
 &lt;li&gt;Add &lt;code&gt;console=ttyS0,115200n8&lt;&#x2F;code&gt; to enable the serial tty&lt;&#x2F;li&gt;
@@ -635,7 +700,7 @@
 &lt;pre style=&quot;background-color:#2b303b;color:#c0c5ce;&quot;&gt;&lt;code&gt;&lt;span&gt;GRUB_CMDLINE_LINUX=&amp;#39;console=ttyS0,19200n8&amp;#39;
 &lt;&#x2F;span&gt;&lt;span&gt;GRUB_TERMINAL=serial
 &lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
-&lt;p&gt;Finally, run &lt;code&gt;update-grub&lt;&#x2F;code&gt; to regenerate the grub boot menu. At this point, the Debian &amp;quot;utility&amp;quot; OS install is complete and it is time to update the BIOS.&lt;&#x2F;p&gt;
+&lt;p&gt;Finally, run &lt;code&gt;update-grub&lt;&#x2F;code&gt; to regenerate the grub boot menu. At this point, the Debian &quot;utility&quot; OS install is complete and it is time to update the BIOS.&lt;&#x2F;p&gt;
 &lt;h3 id=&quot;firmware-update&quot;&gt;Firmware Update&lt;&#x2F;h3&gt;
 &lt;p&gt;Updating the BIOS is fairly simple. First, install the flashrom utility. It&#x27;s available in the Debian package repositories.&lt;&#x2F;p&gt;
 &lt;pre style=&quot;background-color:#2b303b;color:#c0c5ce;&quot;&gt;&lt;code&gt;&lt;span&gt;apt install flashrom
@@ -878,7 +943,7 @@
 &lt;p&gt;Finally, reboot with &lt;code&gt;reboot -p&lt;&#x2F;code&gt;. Now, the router is functional and secured with the pf firewall. At this point, it will work as a minimum viable product. However, every device on the network will need to manually configure its own static IP address, subnet mask, gateway, and DNS server (because there is no DHCP service running to supply these configuration details).&lt;&#x2F;p&gt;
 &lt;h2 id=&quot;dhcp-dhcpd&quot;&gt;DHCP (dhcpd)&lt;&#x2F;h2&gt;
 &lt;p&gt;DHCP is a service that (among other things) gives IP addresses to the devices on your network. So when a device joins the network, it will be given an IP address by the DHCP server running on the router. The DHCP server bundled with OpenBSD 6.6 is dhcpd.&lt;&#x2F;p&gt;
-&lt;p&gt;Most devices, upon joining the network, will be given an IP address from within a specified IP range. They could potentially receive any IP address in this range. However, I wanted some devices to be treated specially and always be given the same IP addresses by dhcpd. That way, I can rely on those devices to have predictable IP addresses. It is simpler and easier to define &amp;quot;static&amp;quot; IP addresses all in one place (on the router) rather than configure static IP addresses on each individual device. This way, every IP on my network is defined in one place, on the router. It will be obvious if two devices are configured to have the same static IP (a classic mistake).&lt;&#x2F;p&gt;
+&lt;p&gt;Most devices, upon joining the network, will be given an IP address from within a specified IP range. They could potentially receive any IP address in this range. However, I wanted some devices to be treated specially and always be given the same IP addresses by dhcpd. That way, I can rely on those devices to have predictable IP addresses. It is simpler and easier to define &quot;static&quot; IP addresses all in one place (on the router) rather than configure static IP addresses on each individual device. This way, every IP on my network is defined in one place, on the router. It will be obvious if two devices are configured to have the same static IP (a classic mistake).&lt;&#x2F;p&gt;
 &lt;p&gt;In addition to defining the IP address allocations in my network, I configured dhcpd to inform devices on my network of the preferred DNS server for the network, the router itself. We haven&#x27;t set this up yet, but the router will also function as a caching DNS server.&lt;&#x2F;p&gt;
 &lt;p&gt;Here is an example &#x2F;etc&#x2F;dhcpd.conf file:&lt;&#x2F;p&gt;
 &lt;pre style=&quot;background-color:#2b303b;color:#c0c5ce;&quot;&gt;&lt;code&gt;&lt;span&gt;# prod network
@@ -902,7 +967,7 @@
 &lt;&#x2F;span&gt;&lt;span&gt;        }
 &lt;&#x2F;span&gt;&lt;span&gt;}
 &lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
-&lt;p&gt;This &#x2F;etc&#x2F;dhcpd.conf file configures the dhcpd server to hand out IP addresses for the dev and prod networks from within the specified ranges. In addition, it informs devices of the local DNS server (not yet configured). It also configures two &amp;quot;special devices&amp;quot; that will always be given the same IP addresses. dhcpd identifies these two devices by their MAC addresses. For more information check out the &lt;a href=&quot;https:&#x2F;&#x2F;man.openbsd.org&#x2F;dhcpd.conf.5&quot;&gt;dhcpd.conf man page&lt;&#x2F;a&gt;.&lt;&#x2F;p&gt;
+&lt;p&gt;This &#x2F;etc&#x2F;dhcpd.conf file configures the dhcpd server to hand out IP addresses for the dev and prod networks from within the specified ranges. In addition, it informs devices of the local DNS server (not yet configured). It also configures two &quot;special devices&quot; that will always be given the same IP addresses. dhcpd identifies these two devices by their MAC addresses. For more information check out the &lt;a href=&quot;https:&#x2F;&#x2F;man.openbsd.org&#x2F;dhcpd.conf.5&quot;&gt;dhcpd.conf man page&lt;&#x2F;a&gt;.&lt;&#x2F;p&gt;
 &lt;p&gt;To enable dhcpd on the em1 and em2 interfaces, run:&lt;&#x2F;p&gt;
 &lt;pre style=&quot;background-color:#2b303b;color:#c0c5ce;&quot;&gt;&lt;code&gt;&lt;span&gt;rcctl enable dhcpd
 &lt;&#x2F;span&gt;&lt;span&gt;rcctl set dhcpd flags em1 em2
@@ -913,7 +978,7 @@
 &lt;ol&gt;
 &lt;li&gt;DNS lookups, if they are already cached, will be quicker. The router will immediately reply with the answer. There will be no need to make a request to some external DNS server on the internet.&lt;&#x2F;li&gt;
 &lt;li&gt;By ensuring all outgoing DNS lookups are performed by the router, it is easy to enforce a standard of security &#x2F; privacy. I have configured the DNS caching server running on the router to always encrypt outgoing DNS requests. Of course, any device on the network is free to use other DNS servers besides the router. However, the pf firewall configuration blocks outgoing requests on port 53, the port commonly used for unencrypted DNS.&lt;&#x2F;li&gt;
-&lt;li&gt;It is possible to configure custom DNS entries for the local network. The &amp;quot;special devices&amp;quot; configured in the DHCP server to always have the same IP addresses can be given DNS entries on the local network. For example, if I have a server running on my home network, I can give it a memorable DNS entry that will always resolve to its &amp;quot;static&amp;quot; IP address defined in the DHCP configuration.&lt;&#x2F;li&gt;
+&lt;li&gt;It is possible to configure custom DNS entries for the local network. The &quot;special devices&quot; configured in the DHCP server to always have the same IP addresses can be given DNS entries on the local network. For example, if I have a server running on my home network, I can give it a memorable DNS entry that will always resolve to its &quot;static&quot; IP address defined in the DHCP configuration.&lt;&#x2F;li&gt;
 &lt;&#x2F;ol&gt;
 &lt;p&gt;Here is an example unbound config file (located at &#x2F;var&#x2F;unbound&#x2F;etc&#x2F;unbound.conf):&lt;&#x2F;p&gt;
 &lt;pre style=&quot;background-color:#2b303b;color:#c0c5ce;&quot;&gt;&lt;code&gt;&lt;span&gt;server:
@@ -944,5 +1009,6 @@
 &lt;p&gt;So, that&#x27;s pretty much it. At this point, the device functions as a router, firewall, DHCP server, and caching DNS server. The software it runs is entirely open source. It maintains several custom DNS entries for services running on my local network. Every outgoing DNS request is guaranteed to be encrypted. For the past few months, I have used this device in my home network and it has been working great. It is secure, performant, minimal, and easy to maintain (only three config files).&lt;&#x2F;p&gt;
 &lt;p&gt;In the future, I will likely add more features to this device. It might be useful to add a VPN service in order to allow me to access my home network from anywhere on the internet. Also, it would be neat to setup some logging &#x2F; metrics collection to analyze network traffic. However, at this point, all of the original project goals have been met. There are probably many easier ways to build a home router, but I learned a lot doing it this way. For now, I am quite happy with this device.&lt;&#x2F;p&gt;
 </content>
-	</entry>
+        
+    </entry>
 </feed>

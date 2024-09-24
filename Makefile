@@ -6,7 +6,7 @@ all:
 	  -it \
 	  -u $$(id -u $${USER}):$$(id -g $${USER}) \
 	  -v "$${PROJECT_ROOT}:/site" \
-	  zola:v0.15.2 \
+	  zola:v0.19.2 \
 	  bash -c 'cd /site && zola build -o docs'
 
 .PHONY: serve
@@ -18,7 +18,7 @@ serve:
 	  -u $$(id -u $${USER}):$$(id -g $${USER}) \
 	  -v "$${PROJECT_ROOT}:/site" \
 	  -p 127.0.0.1:1111:1111 \
-	  zola:v0.15.2 \
+	  zola:v0.19.2 \
 	  bash -c 'cd /site && zola serve -i 0.0.0.0'
 
 .PHONY: clean
